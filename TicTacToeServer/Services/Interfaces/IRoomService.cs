@@ -14,5 +14,6 @@ namespace TicTacToeServer.Services.Interfaces
         Task AddRoomAsync(Room room);
         Task DestroyRoom(int roomId);
         Task<bool> RoomExist(int roomId);
+        bool IsPasswordGood(int roomId, string password);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TicTacToeServer.Hubs;
@@ -27,6 +29,7 @@ namespace TicTacToeServer
                builder =>
                {
                    builder.AllowAnyMethod().AllowAnyHeader()
+                          //.AllowAnyOrigin()
                           .WithOrigins("http://localhost:4200")
                           .AllowCredentials();
                }));

@@ -49,6 +49,12 @@ namespace TicTacToeServer.Services
             );
         }
 
+        public bool IsPasswordGood(int roomId, string password)
+        {
+            var room = _rooms.Find(r => r.Id == roomId);
+            return room.Password == password;
+        }
+
         /**
          * <summary>
          * This is enoguh for this app,
