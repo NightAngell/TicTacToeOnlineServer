@@ -21,6 +21,7 @@ namespace TicTacToeServer.Hubs
         {
             await _roomService.AddRoomAsync(room);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"RoomId{room.Id}");
+            _attachRoomIdToConnectionContext(room.Id);
             await Clients.Caller.SendAsync("HostRoomCreated", room.Id);
         }
 
@@ -42,8 +43,11 @@ namespace TicTacToeServer.Hubs
             await _roomService.DestroyRoom(roomId);
         }
 
-        public async Task AbortRoom(int roomId)
+        public async Task AbortRoom()
         {
+            if (!Context.Items.ContainsKey("RoomId")) return;
+            var roomId = (int)Context.Items["RoomId"];
+            
             await _roomService.DestroyRoom(roomId);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"RoomId{roomId}");
             await Clients.Caller.SendAsync("RoomAborted");
@@ -51,23 +55,23 @@ namespace TicTacToeServer.Hubs
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            var x = Context;
+            if (!Context.Items.ContainsKey("RoomId")) return;
+            var roomId = (int)Context.Items["RoomId"];
+
+            await _roomService.DestroyRoom(roomId);
+
             await base.OnDisconnectedAsync(exception);
         }
 
-        public override Task OnConnectedAsync()
+        private void _attachRoomIdToConnectionContext(int roomID)
         {
-
-            return base.OnConnectedAsync();
+            if (Context.Items.ContainsKey("RoomId"))
+            {
+                Context.Items["RoomId"] = roomID;
+            }else
+            {
+                Context.Items.Add("RoomId", roomID);
+            }
         }
-
-        /**
-         * Przy tworzeniu pokoju
-         * 0. Ustawiać zmienną hostRespond na false
-         * 1. Rozpoczynać interval odpytujacy hosta co 5s
-         * 2. Po 5 sekundach sprawdzić wartość hostRespond
-         * 3. Jeżeli true: ustawić hostRespond na false i wysłać zapytanie
-         * 4. Jeżeli false: skasować pokój
-         */
     }
 }
