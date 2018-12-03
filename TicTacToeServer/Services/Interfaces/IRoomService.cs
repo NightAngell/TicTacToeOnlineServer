@@ -10,10 +10,11 @@ namespace TicTacToeServer.Services.Interfaces
     public interface IRoomService
     {
         Task<IEnumerable<Room>> GetListOfRoomsAsync();
-        Task<IEnumerable<RoomDto>> GetListOfRoomDtosAsync();
+        Task<IEnumerable<RoomDto>> GetListOfRoomsDtosInLobbyAsync();
         Task AddRoomAsync(Room room);
-        Task DestroyRoom(int roomId);
-        Task<bool> RoomExist(int roomId);
-        bool IsPasswordGood(int roomId, string password);
+        Task DestroyRoomAsync(int roomId);
+        Task<Room> GetRoomAsync(int roomId);
+        Room GetRoom(int roomId);
+        Task UpdateRoom(Room room);
     }
 }

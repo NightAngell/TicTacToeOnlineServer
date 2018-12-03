@@ -21,7 +21,7 @@ namespace TicTacToeServer.Controllers
         [HttpGet]
         public async Task<IActionResult> GetListOfRooms()
         {
-            return Ok(await _roomService.GetListOfRoomDtosAsync());
+            return Ok(await _roomService.GetListOfRoomsDtosInLobbyAsync());
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TicTacToeServer.DTO;
+using TicTacToeServer.Enums;
 using TicTacToeServer.Models;
 using TicTacToeServer.Services.Interfaces;
 
@@ -12,16 +13,19 @@ namespace TicTacToeServer.Services
     {
         static readonly List<Room> _rooms = new List<Room>();
         static int _roomId = 0;
+
+        readonly object _newRoomIdLock = new object();
         public async Task<IEnumerable<Room>> GetListOfRoomsAsync()
         {
             return await Task.FromResult(_rooms);
         }
 
-        public async Task<IEnumerable<RoomDto>> GetListOfRoomDtosAsync()
+        public async Task<IEnumerable<RoomDto>> GetListOfRoomsDtosInLobbyAsync()
         {
             var roomDtos = new List<RoomDto>();
             foreach (var room in _rooms)
             {
+                if (room.State != RoomState.InLobby) continue;
                 var roomDto = new RoomDto();
                 roomDto.Id = room.Id;
                 roomDto.IsPassword = room.Password != null && room.Password.Length > 0;
@@ -33,26 +37,34 @@ namespace TicTacToeServer.Services
 
         public async Task AddRoomAsync(Room room)
         {
-            room.Id = _getPseudoUniqueId();
-            _rooms.Add(room);
+            lock (_newRoomIdLock)
+            {
+                room.Id = _getPseudoUniqueId();
+                _rooms.Add(room);
+            }
         }
 
-        public async Task<bool> RoomExist(int roomId)
-        {
-            return await Task.FromResult(_rooms.FindIndex(r => r.Id == roomId) != -1);
-        }
-
-        public async Task DestroyRoom(int roomId)
+        public async Task DestroyRoomAsync(int roomId)
         {
             _rooms.Remove(
                 _rooms.Find(r => r.Id == roomId)
             );
         }
 
-        public bool IsPasswordGood(int roomId, string password)
+        public Task<Room> GetRoomAsync(int roomId)
         {
-            var room = _rooms.Find(r => r.Id == roomId);
-            return room.Password == password;
+            return Task.FromResult(_rooms.Find(r => r.Id == roomId));
+        }
+
+        public Room GetRoom(int roomId)
+        {
+            return _rooms.Find(r => r.Id == roomId);
+        }
+
+        public async Task UpdateRoom(Room room)
+        {
+            int index = _rooms.FindIndex(r => r.Id == room.Id);
+            _rooms[index] = room;
         }
 
         /**

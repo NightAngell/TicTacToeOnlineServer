@@ -25,6 +25,7 @@ namespace TicTacToeServer
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IGameService, GameService>();
             services.AddCors(options => options.AddPolicy("CorsPolicy",
                builder =>
                {
