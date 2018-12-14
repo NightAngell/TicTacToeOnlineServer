@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TicTacToeServer.Database;
 using TicTacToeServer.Hubs;
 using TicTacToeServer.Services;
-using TicTacToeServer.Services.Interfaces;
 
 namespace TicTacToeServer
 {
@@ -24,8 +25,18 @@ namespace TicTacToeServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IHubService, HubService>();
+
+            services.AddDbContext<Db>(options => options.UseSqlServer(
+                @"Server=(localdb)\mssqllocaldb;
+                Database=TicTacToeProject;
+                Trusted_Connection=True;
+                ConnectRetryCount=0"
+             ));
+
             services.AddCors(options => options.AddPolicy("CorsPolicy",
                builder =>
                {

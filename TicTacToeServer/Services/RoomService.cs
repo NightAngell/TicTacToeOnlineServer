@@ -1,83 +1,102 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TicTacToeServer.Database;
 using TicTacToeServer.DTO;
 using TicTacToeServer.Enums;
 using TicTacToeServer.Models;
-using TicTacToeServer.Services.Interfaces;
 
 namespace TicTacToeServer.Services
 {
     public class RoomService : IRoomService
     {
-        static readonly List<Room> _rooms = new List<Room>();
-        static int _roomId = 0;
+        readonly Db _db;
 
-        readonly object _newRoomIdLock = new object();
+        public RoomService(Db db)
+        {
+            _db = db;
+        }
+
         public async Task<IEnumerable<Room>> GetListOfRoomsAsync()
         {
-            return await Task.FromResult(_rooms);
+            return await _db.Rooms.ToListAsync();
         }
 
         public async Task<IEnumerable<RoomDto>> GetListOfRoomsDtosInLobbyAsync()
         {
             var roomDtos = new List<RoomDto>();
-            foreach (var room in _rooms)
+            var rooms = await _db.Rooms.ToListAsync();
+            foreach (var room in rooms)
             {
                 if (room.State != RoomState.InLobby) continue;
-                var roomDto = new RoomDto();
-                roomDto.Id = room.Id;
-                roomDto.IsPassword = room.Password != null && room.Password.Length > 0;
-                roomDto.HostNick = room.HostNick;
+                var roomDto = new RoomDto
+                {
+                    Id = room.Id,
+                    IsPassword = room.Password != null && room.Password.Length > 0,
+                    HostNick = room.HostNick
+                };
                 roomDtos.Add(roomDto);
             }
             return roomDtos;
         }
 
-        public async Task AddRoomAsync(Room room)
+        public void AddRoom(Room room)
         {
-            lock (_newRoomIdLock)
+            _db.Rooms.Add(room);
+        }
+
+        public void AddRoomWithHostInsideWithInLobbyState(Room room)
+        {
+            room.NumberOfPlayersInside = 1;
+            room.State = RoomState.InLobby;
+            _db.Rooms.Add(room);
+        }
+
+        public void DestroyRoom(int roomId)
+        {
+            var room = new Room()
             {
-                room.Id = _getPseudoUniqueId();
-                _rooms.Add(room);
-            }
+                Id = roomId
+            };
+            _db.Rooms.Attach(room);
+            _db.Rooms.Remove(room);
         }
 
-        public async Task DestroyRoomAsync(int roomId)
+        public async Task<Room> GetRoomAsync(int roomId)
         {
-            _rooms.Remove(
-                _rooms.Find(r => r.Id == roomId)
-            );
+            return await _db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
         }
 
-        public Task<Room> GetRoomAsync(int roomId)
+        public async Task<Room> GetRoomWithGameAndGameField(int roomId)
         {
-            return Task.FromResult(_rooms.Find(r => r.Id == roomId));
+            return await _db.Rooms
+                .Include(r => r.Game)
+                .ThenInclude(g => g.Field) 
+                .FirstOrDefaultAsync(r => r.Id == roomId);
         }
 
         public Room GetRoom(int roomId)
         {
-            return _rooms.Find(r => r.Id == roomId);
+            return _db.Rooms.FirstOrDefault(r => r.Id == roomId);
         }
 
-        public async Task UpdateRoom(Room room)
+        public void SaveChanges()
         {
-            int index = _rooms.FindIndex(r => r.Id == room.Id);
-            _rooms[index] = room;
+            _db.SaveChanges();
         }
 
-        /**
-         * <summary>
-         * This is enoguh for this app,
-         * because we it`s not possible to play int.Max players simultaneously
-         * </summary>
-         */
-        private int _getPseudoUniqueId()
+        public async Task SaveChangesAsync()
         {
-            _roomId++;
-            if (_roomId < 0) _roomId = 1;
-            return _roomId;
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task SetState(int roomId, RoomState state)
+        {
+            var room = await GetRoomAsync(roomId);
+            room.State = state;
+            await SaveChangesAsync();
         }
     }
 }

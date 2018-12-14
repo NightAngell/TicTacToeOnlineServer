@@ -5,30 +5,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using TicTacToeServer.Database;
 using TicTacToeServer.Enums;
 using TicTacToeServer.Models;
-using TicTacToeServer.Services.Interfaces;
+using TicTacToeServer.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace TicTacToeServer.Hubs
 {
     public class RoomHub : Hub
     {
-        readonly IRoomService _roomService;
-        readonly object _roomLock = new object();
+        //We need use instance of Db here directly, because in OnDisconnectedAsync
+        //Db instance from services not exist
+        readonly Db _db;
+        const string _roomIdKey = "RoomId";
 
-        public RoomHub(IRoomService roomService)
+        readonly IHubService _hubService;
+        readonly IRoomService _roomService;
+        readonly object _numberOfPlayersInRoomLock = new object();
+
+        public RoomHub(IRoomService roomService, IHubService hubService, Db db)
         {
             _roomService = roomService;
+            _hubService = hubService;
+            _db = db;
         }
 
         public async Task CreateHostRoom(Room room)
         {
-            room.NumberOfPlayersInside = 1;
-            room.State = RoomState.InLobby;
-            await _roomService.AddRoomAsync(room);
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"RoomId{room.Id}");
-            _attachRoomIdToConnectionContext(room.Id);
-            await Clients.Caller.SendAsync("HostRoomCreated", room.Id);
+            try
+            {
+                _roomService.AddRoomWithHostInsideWithInLobbyState(room);
+                await _roomService.SaveChangesAsync();
+                await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
+                _hubService.AddOrUpdateItemInContextItems(this, _roomIdKey, room.Id);
+                await Clients.Caller.SendAsync("HostRoomCreated", room.Id);
+            }catch(Exception e)
+            {
+                // log
+            }
+           
         }
 
         public async Task AddGuestToRoom(int roomId, string password, string guestNick)
@@ -45,7 +61,9 @@ namespace TicTacToeServer.Hubs
                 return;
             }
 
-            lock (_roomLock)
+            string hostGuid;
+            string guestGuid;
+            lock (_numberOfPlayersInRoomLock)
             {
                 room = _roomService.GetRoom(roomId);
                 if (room == null || room.NumberOfPlayersInside == 2)
@@ -53,61 +71,50 @@ namespace TicTacToeServer.Hubs
                     Clients.Caller.SendAsync("PlayerCannotJoinToRoom", "Room is full or not exist");
                     return;
                 }
+
                 room.NumberOfPlayersInside++;
+                hostGuid = Guid.NewGuid().ToString();
+                guestGuid = Guid.NewGuid().ToString();
+                room.GuestNick = guestNick;
+                room.HostId = hostGuid;
+                room.GuestId = guestGuid;
+                room.State = RoomState.WaitingForFirstPlayer;
+                _roomService.SaveChanges();
             }
-            
-            string hostGuid = Guid.NewGuid().ToString();
-            string guestGuid = Guid.NewGuid().ToString();
 
-            room.GuestNick = guestNick;
-            room.HostId = hostGuid;
-            room.GuestId = guestGuid;
-            room.State = RoomState.ReadyForGame;
-            await _roomService.UpdateRoom(room);
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"RoomId{roomId}");
-            await Clients.OthersInGroup($"RoomId{roomId}").SendAsync("GuestJoinToRoom", roomId, hostGuid);
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
+            await Clients.OthersInGroup(roomId.ToString()).SendAsync("GuestJoinToRoom", roomId, hostGuid);
             await Clients.Caller.SendAsync("GuestJoinToRoom", roomId, guestGuid);
         }
 
         public async Task AbortRoom()
         {
-            if (!Context.Items.ContainsKey("RoomId")) return;
-            var roomId = (int)Context.Items["RoomId"];
+            if (!Context.Items.ContainsKey(_roomIdKey)) return;
+            var roomId = (int)Context.Items[_roomIdKey];
             
-            await _roomService.DestroyRoomAsync(roomId);
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"RoomId{roomId}");
+            _roomService.DestroyRoom(roomId);
+            await _roomService.SaveChangesAsync();
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
             await Clients.Caller.SendAsync("RoomAborted");
         }
 
-
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            if (!Context.Items.ContainsKey("RoomId")) return;
-            int roomId = (int)Context.Items["RoomId"];
+            if (!Context.Items.ContainsKey(_roomIdKey)) return;
+            int roomId = (int)Context.Items[_roomIdKey];
 
-            var room = await _roomService.GetRoomAsync(roomId);
+            var room = await _db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
             if (room == null)
             {
                 await base.OnDisconnectedAsync(exception);
                 return;
             }
 
-            if(room.State == RoomState.InLobby)
+            if (room.State == RoomState.InLobby)
             {
-                await _roomService.DestroyRoomAsync(room.Id);
+                _db.Rooms.Remove(room);
+                await _db.SaveChangesAsync();
             }  
-        }
-
-        private void _attachRoomIdToConnectionContext(int roomID)
-        {
-            if (Context.Items.ContainsKey("RoomId"))
-            {
-                Context.Items["RoomId"] = roomID;
-            }else
-            {
-                Context.Items.Add("RoomId", roomID);
-            }
         }
     }
 }

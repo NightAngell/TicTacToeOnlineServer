@@ -8,7 +8,8 @@ namespace TicTacToeServer.Enums
     public enum RoomState
     {
         InLobby,
-        ReadyForGame,
+        WaitingForFirstPlayer,
+        WaitingForSecondPlayer,
         InGame,
     }
 }
