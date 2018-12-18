@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using TicTacToeServer.Database;
 using TicTacToeServer.Hubs;
 using TicTacToeServer.Models;
@@ -75,10 +77,12 @@ namespace TicTacToeServer
             services.AddCors(options => options.AddPolicy("CorsPolicy",
                builder =>
                {
-                   builder.AllowAnyMethod().AllowAnyHeader()
-                          //.AllowAnyOrigin()
-                          .WithOrigins("http://localhost:4200")
-                          .AllowCredentials();
+                   builder
+                        .AllowAnyOrigin()
+                        //.WithOrigins("http://localhost:4200")
+                        .AllowCredentials()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();   
                }));
         }
 
@@ -107,15 +111,48 @@ namespace TicTacToeServer
             }).AddJwtBearer(options => {
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = true;
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidAudience = Configuration["Jwt:Site"],
-                    ValidIssuer = Configuration["Jwt:Site"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:SigningKey"]))
-                };
+                options.TokenValidationParameters = _getTokenValidationParameters(options);
+                options.Events = _getJwtBearerEvents(options);
             });
+        }
+
+        private TokenValidationParameters _getTokenValidationParameters(JwtBearerOptions options)
+        {
+            return new TokenValidationParameters()
+            {
+                LifetimeValidator = (before, expires, token, param) =>
+                {
+                    return expires > DateTime.UtcNow;
+                },
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateActor = false,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:SigningKey"]))
+            };
+
+        }
+
+        private JwtBearerEvents _getJwtBearerEvents(JwtBearerOptions options)
+        {
+            return new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) && _pathContainHubPath(path))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        }
+
+        private bool _pathContainHubPath(PathString path )
+        {
+            return path.StartsWithSegments("/roomHub") || path.StartsWithSegments("/gameHub");
         }
     }
 }

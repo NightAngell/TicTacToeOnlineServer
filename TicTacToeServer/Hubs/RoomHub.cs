@@ -10,6 +10,7 @@ using TicTacToeServer.Enums;
 using TicTacToeServer.Models;
 using TicTacToeServer.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicTacToeServer.Hubs
 {
@@ -31,6 +32,7 @@ namespace TicTacToeServer.Hubs
             _db = db;
         }
 
+        [Authorize]
         public async Task CreateHostRoom(Room room)
         {
             try

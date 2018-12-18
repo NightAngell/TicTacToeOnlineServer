@@ -45,10 +45,9 @@ namespace TicTacToeServer.Controllers
                 await _userManager.AddToRoleAsync(user, Roles.User.ToString());
             }
 
-            return Ok(new { Username = user.UserName });
+            return Ok();
         }
 
-        [Route("login")]
         [HttpPost]
         public async Task<ActionResult> Login([FromBody] LoginDto model)
         {
