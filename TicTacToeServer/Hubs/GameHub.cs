@@ -106,6 +106,11 @@ namespace TicTacToeServer.Hubs
                     await Clients.Group(roomId.ToString()).SendAsync("Draw");
                 }
             }
+            else if(_gameService.IsWinner(room.Game.Field))
+            {
+                await Clients.Caller.SendAsync("Win");
+                await Clients.OthersInGroup(roomId.ToString()).SendAsync("Lose");
+            }
 
             _gameService.NextPlayerTurn(room);
             await _gameService.SaveChangesAsync();
