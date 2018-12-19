@@ -80,5 +80,28 @@ namespace TicTacToeServer.Controllers
 
             return Unauthorized();
         }
+
+        [Authorize]
+        [Route("refresh")]
+        [HttpGet]
+        public async Task<ActionResult> RefreshToken()
+        {
+            var claim = new[] {
+                    new Claim(ClaimTypes.Role, Roles.User.ToString()),
+            };
+            var signinKey = new SymmetricSecurityKey(
+              Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]));
+
+            int expiryInMinutes = Convert.ToInt32(_configuration["Jwt:ExpiryInMinutes"]);
+
+            var token = new JwtSecurityToken(
+              issuer: _configuration["Jwt:Site"],
+              audience: _configuration["Jwt:Site"],
+              expires: DateTime.UtcNow.AddMinutes(expiryInMinutes),
+              signingCredentials: new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token), expiration = token.ValidTo });
+        }
     }
 }
