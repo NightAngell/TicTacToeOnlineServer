@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ using TicTacToeServer.Models;
 
 namespace TicTacToeServer.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -43,6 +45,10 @@ namespace TicTacToeServer.Controllers
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, Roles.User.ToString());
+            } 
+            else
+            {
+                return BadRequest(result.Errors);
             }
 
             return Ok();
@@ -51,7 +57,7 @@ namespace TicTacToeServer.Controllers
         [HttpPost]
         public async Task<ActionResult> Login([FromBody] LoginDto model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email);           
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 var claim = new[] {
@@ -71,6 +77,7 @@ namespace TicTacToeServer.Controllers
 
                 return Ok( new { token = new JwtSecurityTokenHandler().WriteToken(token), expiration = token.ValidTo } );
             }
+
             return Unauthorized();
         }
     }
