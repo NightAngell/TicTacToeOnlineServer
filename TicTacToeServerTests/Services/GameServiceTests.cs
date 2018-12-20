@@ -313,5 +313,26 @@ namespace TicTacToeServerTests.Services
 
             Assert.IsTrue(room.Game.CurrentPlayerId == "b");
         }
+
+        //IsPlayerTurn
+        [Test]
+        public void IsPlayerTurn_IsPlayerTurn_ReturnsTrue()
+        {
+            string playerId = "playerTestID";
+            var game = new Game();
+            game.CurrentPlayerId = playerId;
+
+            Assert.IsTrue(game.CurrentPlayerId == playerId);
+        }
+
+        [Test]
+        public void IsPlayerTurn_IsNotPlayerTurn_ReturnsFalse()
+        {
+            string playerId = "playerTestID";
+            var game = new Game();
+            game.CurrentPlayerId = playerId;
+
+            Assert.IsFalse(game.CurrentPlayerId == "aaa");
+        }
     }
 }
