@@ -284,5 +284,17 @@ namespace TicTacToeServerTests.Services
         {
             Assert.IsTrue(_gameService.Map2DimensionalParamsToGameSimpleField(i,j) == field);
         }
+
+        //MakeMove
+        [Test]
+        public void MakeMove_MoveAlwaysShouldBeDone_MoveDone()
+        {
+            var game = new Game();
+            game.CurrentPlayerId = "playerTestID";
+            game.Field = new GameField();
+
+            _gameService.MakeMove(game, GameFieldFields.Middle);
+            Assert.IsTrue(game.Field.Middle == "playerTestID");
+        }
     }
 }
