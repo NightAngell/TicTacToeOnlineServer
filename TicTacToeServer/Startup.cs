@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using TicTacToeServer.Database;
+using TicTacToeServer.Helpers;
 using TicTacToeServer.Hubs;
 using TicTacToeServer.Models;
 using TicTacToeServer.Services;
@@ -48,7 +50,7 @@ namespace TicTacToeServer
             _addIdentity(services);
             _addJwtAuth(services);
             _addCors(services);
-
+            _addAutomapper(services);
             services.AddSignalR();
         }
 
@@ -114,6 +116,17 @@ namespace TicTacToeServer
                 options.TokenValidationParameters = _getTokenValidationParameters(options);
                 options.Events = _getJwtBearerEvents(options);
             });
+        }
+
+        private void _addAutomapper(IServiceCollection services)
+        {
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         private TokenValidationParameters _getTokenValidationParameters(JwtBearerOptions options)

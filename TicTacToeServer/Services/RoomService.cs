@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace TicTacToeServer.Services
     public class RoomService : IRoomService
     {
         readonly Db _db;
+        readonly IMapper _mapper;
 
-        public RoomService(Db db)
+        public RoomService(Db db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Room>> GetListOfRoomsAsync()
@@ -31,12 +34,13 @@ namespace TicTacToeServer.Services
             foreach (var room in rooms)
             {
                 if (room.State != RoomState.InLobby) continue;
-                var roomDto = new RoomDto
+                var roomDto = _mapper.Map<RoomDto>(room);
+                /*var roomDto = new RoomDto
                 {
                     Id = room.Id,
                     IsPassword = room.Password != null && room.Password.Length > 0,
                     HostNick = room.HostNick
-                };
+                };*/
                 roomDtos.Add(roomDto);
             }
             return roomDtos;
