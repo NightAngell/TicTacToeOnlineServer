@@ -3,6 +3,8 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TicTacToeServer.Enums;
+using TicTacToeServer.Exceptions;
 using TicTacToeServer.Models;
 using TicTacToeServer.Services;
 
@@ -231,6 +233,56 @@ namespace TicTacToeServerTests.Services
             };
 
             Assert.IsFalse(_gameService.IsWinner(field));
+        }
+
+        //CanMakeMove
+        [Test]
+        public void CanMakeMove_FieldIsFree_ReturnsTrue()
+        {
+            var field = new GameField();
+            Assert.IsTrue(_gameService.CanMakeMove(field, GameFieldFields.Down));
+        }
+
+        [Test]
+        public void CanMakeMove_FieldNotFree_ReturnsFalse()
+        {
+            var field = new GameField();
+            field.Down = "x";
+            Assert.IsFalse(_gameService.CanMakeMove(field, GameFieldFields.Down));
+        }
+
+        //Map2DimensionalParamsToGameSimpleField
+        [Test]
+        public void Map2DimensionalParamsToGameSimpleField_ParamsInvalid_ThrowsNotValidFieldParamsException()
+        {
+            Assert.Throws<NotValidFieldParamsException>(
+                ()=> _gameService.Map2DimensionalParamsToGameSimpleField(1, 5)
+            );
+        }
+
+        private static object[] _paramsToMapWithResult =
+        {
+            new object[] { 0, 0, GameFieldFields.TopLeft},
+            new object[] { 0, 1, GameFieldFields.Top},
+            new object[] { 0, 2, GameFieldFields.TopRight},
+
+            new object[] { 1, 0, GameFieldFields.MiddleLeft},
+            new object[] { 1, 1, GameFieldFields.Middle},
+            new object[] { 1, 2, GameFieldFields.MiddleRight},
+
+            new object[] { 2, 0, GameFieldFields.DownLeft},
+            new object[] { 2, 1, GameFieldFields.Down},
+            new object[] { 2, 2, GameFieldFields.DownRight},
+
+        };
+        [Test, TestCaseSource(nameof(_paramsToMapWithResult))]
+        public void Map2DimensionalParamsToGameSimpleField_ParamsValid_AllParamsCorrectlyMapped(
+            int i,
+            int j,
+            GameFieldFields field
+        )
+        {
+            Assert.IsTrue(_gameService.Map2DimensionalParamsToGameSimpleField(i,j) == field);
         }
     }
 }
