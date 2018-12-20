@@ -296,5 +296,22 @@ namespace TicTacToeServerTests.Services
             _gameService.MakeMove(game, GameFieldFields.Middle);
             Assert.IsTrue(game.Field.Middle == "playerTestID");
         }
+
+        //NextPlayerTurn
+        [Test]
+        public void NextPlayerTurn_WeHaveValidData_CurrentPlayerChange()
+        {
+            var room = new Room() {
+                GuestId = "a",
+                HostId = "b"
+            };
+            room.Game = new Game {
+                CurrentPlayerId = "a"
+            };
+
+            _gameService.NextPlayerTurn(room);
+
+            Assert.IsTrue(room.Game.CurrentPlayerId == "b");
+        }
     }
 }
