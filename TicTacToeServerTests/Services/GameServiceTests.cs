@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using TicTacToeServer.Enums;
 using TicTacToeServer.Exceptions;
 using TicTacToeServer.Models;
@@ -56,6 +57,12 @@ namespace TicTacToeServerTests.Services
                 DownRight = "x"
             };
         }
+
+        private static object[] _gameFieldsHorizontalWinner = {
+            new object[] { _gameFieldWinnerHorizontalTop() },
+            new object[] { _gameFieldWinnerHorizontalMiddle() },
+            new object[] { _gameFieldWinnerHorizontalDown() },
+        };
         #endregion
 
         #region gameFieldsVerticalWinner
@@ -88,6 +95,12 @@ namespace TicTacToeServerTests.Services
                 DownRight = "x"
             };
         }
+
+        private static object[] _gameFieldsVerticalWinner = {
+            new object[] { _gameFieldWinnerVerticalLeft() },
+            new object[] { _gameFieldWinnerVerticalMiddle() },
+            new object[] { _gameFieldWinnerVerticalRight() },
+        };
         #endregion
 
         #region gameFieldsUnderTheSlantWinner
@@ -110,6 +123,11 @@ namespace TicTacToeServerTests.Services
                 TopRight = "x"
             };
         }
+
+        private static object[] _gameFieldsUnderTheSlantWinner = {
+            new object[] { _gameFieldTopLeftDownRightWinner() },
+            new object[] { _gameFieldDownLeftTopRightWinner() },
+        };
         #endregion
 
         private static object[] _gameFieldsWhereIsWinner =
@@ -333,6 +351,71 @@ namespace TicTacToeServerTests.Services
             game.CurrentPlayerId = playerId;
 
             Assert.IsFalse(game.CurrentPlayerId == "aaa");
+        }
+
+        //IsWinnerVertical
+        [Test, TestCaseSource(nameof(_gameFieldsVerticalWinner))]
+        public void IsWinnerVertical_IsWinnerVertical_ReturnsTrue(GameField field)
+        {
+            Assert.IsTrue(_gameService.IsWinnerVertical(field));
+        }
+
+        [Test, TestCaseSource(nameof(_gameFieldsHorizontalWinner))]
+        public void IsWinnerVertical_IsWinnerHorizontal_ReturnsFalse(GameField field)
+        {
+            Assert.IsFalse(_gameService.IsWinnerVertical(field));
+        }
+
+        [Test, TestCaseSource(nameof(_gameFieldsUnderTheSlantWinner))]
+        public void IsWinnerVertical_IsWinnerUnderTheSlant_ReturnsFalse(GameField field)
+        {
+            Assert.IsFalse(_gameService.IsWinnerVertical(field));
+        }
+
+        //IsWinnerHorizontal
+        [Test, TestCaseSource(nameof(_gameFieldsHorizontalWinner))]
+        public void IsWinnerHorizontal_IsWinnerHorizontal_ReturnsTrue(GameField field)
+        {
+            Assert.IsTrue(_gameService.IsWinnerHorizontal(field));
+        }
+
+        [Test, TestCaseSource(nameof(_gameFieldsVerticalWinner))]
+        public void IsWinnerHorizontal_IsWinnerVertical_ReturnsFalse(GameField field)
+        {
+            Assert.IsFalse(_gameService.IsWinnerHorizontal(field));
+        }
+
+        [Test, TestCaseSource(nameof(_gameFieldsUnderTheSlantWinner))]
+        public void IsWinnerHorizontal_IsWinnerUnderTheSlant_ReturnsFalse(GameField field)
+        {
+            Assert.IsFalse(_gameService.IsWinnerHorizontal(field));
+        }
+
+        //IsWinnerUnderTheSlant
+        [Test, TestCaseSource(nameof(_gameFieldsUnderTheSlantWinner))]
+        public void IIsWinnerUnderTheSlant_IsWinnerUnderTheSlant_ReturnsTrue(GameField field)
+        {
+            Assert.IsTrue(_gameService.IsWinnerUnderTheSlant(field));
+        }
+
+        [Test, TestCaseSource(nameof(_gameFieldsVerticalWinner))]
+        public void IIsWinnerUnderTheSlant_IsWinnerVertical_ReturnsFalse(GameField field)
+        {
+            Assert.IsFalse(_gameService.IsWinnerUnderTheSlant(field));
+        }
+
+        [Test, TestCaseSource(nameof(_gameFieldsHorizontalWinner))]
+        public void IIsWinnerUnderTheSlant_IsWinnerHorizontal_ReturnsFalse(GameField field)
+        {
+            Assert.IsFalse(_gameService.IsWinnerUnderTheSlant(field));
+        }
+
+        //SaveChangesAsync
+        [Test]
+        public async Task SaveChangesAsync_MethodFired_RoomServiceSaveChangesAsyncFiredOnce()
+        {
+            await _gameService.SaveChangesAsync();
+            _roomServiceMock.Verify(s => s.SaveChangesAsync(), Times.Once);
         }
     }
 }
