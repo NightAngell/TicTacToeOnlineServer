@@ -11,6 +11,7 @@ using TicTacToeServer.Models;
 using TicTacToeServer.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using TicTacToeServer.Extensions;
 
 namespace TicTacToeServer.Hubs
 {
@@ -21,14 +22,12 @@ namespace TicTacToeServer.Hubs
         readonly Db _db;
         const string _roomIdKey = "RoomId";
 
-        readonly IHubService _hubService;
         readonly IRoomService _roomService;
         readonly object _numberOfPlayersInRoomLock = new object();
 
-        public RoomHub(IRoomService roomService, IHubService hubService, Db db)
+        public RoomHub(IRoomService roomService, Db db)
         {
             _roomService = roomService;
-            _hubService = hubService;
             _db = db;
         }
 
@@ -40,7 +39,7 @@ namespace TicTacToeServer.Hubs
                 _roomService.AddRoomWithHostInsideWithInLobbyState(room);
                 await _roomService.SaveChangesAsync();
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
-                _hubService.AddOrUpdateItemInContextItems(this, _roomIdKey, room.Id);
+                this.AddOrUpdateItemInContextItems(_roomIdKey, room.Id);
                 await Clients.Caller.SendAsync("HostRoomCreated", room.Id);
             }catch(Exception e)
             {

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TicTacToeServer.Services
+namespace TicTacToeServer.Extensions
 {
-    public class HubService : IHubService
+    public static class HubExtension
     {
-        public void AddOrUpdateItemInContextItems<T>(Hub hub, string key, T value)
+        public static void AddOrUpdateItemInContextItems<T>(this Hub hub, string key, T value)
         {
             if (hub.Context.Items.ContainsKey(key))
             {

@@ -16,14 +16,12 @@ namespace TicTacToeServer.Hubs
 
         readonly IGameService _gameService;
         readonly IRoomService _roomService;
-        readonly IHubService _hubService;
         readonly Db _db;
 
-        public GameHub(IGameService gameService, IRoomService roomService, IHubService hubService, Db db)
+        public GameHub(IGameService gameService, IRoomService roomService, Db db)
         {
            _gameService = gameService;
            _roomService = roomService;
-           _hubService = hubService;
             _db = db;
         }
 
