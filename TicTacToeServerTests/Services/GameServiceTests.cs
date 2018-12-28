@@ -340,7 +340,7 @@ namespace TicTacToeServerTests.Services
             var game = new Game();
             game.CurrentPlayerId = playerId;
 
-            Assert.IsTrue(game.CurrentPlayerId == playerId);
+            Assert.IsTrue(_gameService.IsPlayerTurn(game, playerId));
         }
 
         [Test]
@@ -350,7 +350,7 @@ namespace TicTacToeServerTests.Services
             var game = new Game();
             game.CurrentPlayerId = playerId;
 
-            Assert.IsFalse(game.CurrentPlayerId == "aaa");
+            Assert.IsFalse(_gameService.IsPlayerTurn(game, playerId));
         }
 
         //IsWinnerVertical
