@@ -93,7 +93,7 @@ namespace TicTacToeServer.Hubs
             if (!Context.Items.ContainsKey(_roomIdKey)) return;
             var roomId = (int)Context.Items[_roomIdKey];
             
-            _roomService.DestroyRoom(roomId);
+            _roomService.AttachAndDestroyRoom(roomId);
             await _roomService.SaveChangesAsync();
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
             await Clients.Caller.SendAsync("RoomAborted");
