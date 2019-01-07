@@ -17,7 +17,6 @@ namespace TicTacToeServer.Services
         Room GetRoom(int roomId);
         Task<Room> GetRoomAsync(int roomId);
         Task SaveChangesAsync();
-        Task SetStateAndSaveChangesAsync(int roomId, RoomState state);
         Task<Room> GetRoomWithGameAndGameField(int roomId);
     }
 }

@@ -89,12 +89,5 @@ namespace TicTacToeServer.Services
         {
             await _db.SaveChangesAsync();
         }
-
-        public async Task SetStateAndSaveChangesAsync(int roomId, RoomState state)
-        {
-            var room = await GetRoomAsync(roomId);
-            room.State = state;
-            await SaveChangesAsync();
-        }
     }
 }
