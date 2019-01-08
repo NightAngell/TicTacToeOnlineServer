@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using TicTacToeServer.DTO;
 using TicTacToeServer.Enums;
 using TicTacToeServer.Models;
+using TicTacToeServer.Services;
 
 namespace TicTacToeServer.Controllers
 {
@@ -24,11 +25,16 @@ namespace TicTacToeServer.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IGuidService _guidService;
 
-        public AuthController(UserManager<AppUser> userManager, IConfiguration configuration)
+        public AuthController(
+            UserManager<AppUser> userManager, 
+            IConfiguration configuration, 
+            IGuidService guidService)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _guidService = guidService;
         }
 
         [Route("register")]
@@ -39,7 +45,7 @@ namespace TicTacToeServer.Controllers
             {
                 Email = model.Email,
                 UserName = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString()
+                SecurityStamp = _guidService.NewGuid().ToString()
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
