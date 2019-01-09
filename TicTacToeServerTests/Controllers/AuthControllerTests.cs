@@ -36,11 +36,7 @@ namespace TicTacToeServerTests.Controllers
         public async Task Register_UserDataValid_UserRegistratedWithUserRole()
         {
             _setupMocksForRegister_UserDataValid_UserRegistratedWithUserRole();
-            _authController = new AuthController(
-                _userManagerMock.Object,
-                _configMock.Object,
-                _guidServiceMock.Object
-            );
+            _initAuthController();
 
             var actionResult = await _authController.Register(_getValidRegisterDto());
 
@@ -77,6 +73,43 @@ namespace TicTacToeServerTests.Controllers
                 .Returns(Task.FromResult(IdentityResult.Success));
         }
 
+        [Test]
+        public async Task Register_UserDataInvalid_UserGetBadRequestWithErrorList()
+        {
+            _setupMocksForRegister_UserDataInvalid_UserGetBadRequestWithErrorList();
+            _initAuthController();
+
+            var actionResult = await _authController.Register(new RegisterDto() {
+                Email = "lorem",
+                Password = "ipsum"
+            });
+            var badRequestObjectResult = actionResult as BadRequestObjectResult;
+            var requestValue = badRequestObjectResult.Value as List<IdentityError>;
+
+            Assert.IsTrue(badRequestObjectResult != null);
+            Assert.IsTrue(requestValue.Count > 0);
+        }
+        private void _setupMocksForRegister_UserDataInvalid_UserGetBadRequestWithErrorList()
+        {
+            Guid guid = Guid.NewGuid();
+            _guidServiceMock.Setup(x => x.NewGuid()).Returns(guid);
+
+            _userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<AppUser>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError()));
+        }
+
+        //Login
+
+        //Helpers
+        private void _initAuthController()
+        {
+            _authController = new AuthController(
+                _userManagerMock.Object,
+                _configMock.Object,
+                _guidServiceMock.Object
+            );
+        }
         private RegisterDto _getValidRegisterDto()
         {
             return new RegisterDto{
