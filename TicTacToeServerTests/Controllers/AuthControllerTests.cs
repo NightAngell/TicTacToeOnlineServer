@@ -95,7 +95,10 @@ namespace TicTacToeServerTests.Controllers
             _guidServiceMock.Setup(x => x.NewGuid()).Returns(guid);
 
             _userManagerMock
-                .Setup(x => x.CreateAsync(It.IsAny<AppUser>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(
+                    It.Is<AppUser>(a => a.Email == "lorem" && a.UserName == "lorem"), "ipsum"
+                    )
+                 )
                 .ReturnsAsync(IdentityResult.Failed(new IdentityError()));
         }
 
