@@ -35,12 +35,6 @@ namespace TicTacToeServer.Services
             {
                 if (room.State != RoomState.InLobby) continue;
                 var roomDto = _mapper.Map<RoomDto>(room);
-                /*var roomDto = new RoomDto
-                {
-                    Id = room.Id,
-                    IsPassword = room.Password != null && room.Password.Length > 0,
-                    HostNick = room.HostNick
-                };*/
                 roomDtos.Add(roomDto);
             }
             return roomDtos;
@@ -58,7 +52,7 @@ namespace TicTacToeServer.Services
             _db.Rooms.Add(room);
         }
 
-        public void DestroyRoom(int roomId)
+        public void AttachAndDestroyRoom(int roomId)
         {
             var room = new Room()
             {
@@ -94,13 +88,6 @@ namespace TicTacToeServer.Services
         public async Task SaveChangesAsync()
         {
             await _db.SaveChangesAsync();
-        }
-
-        public async Task SetState(int roomId, RoomState state)
-        {
-            var room = await GetRoomAsync(roomId);
-            room.State = state;
-            await SaveChangesAsync();
         }
     }
 }

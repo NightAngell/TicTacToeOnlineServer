@@ -63,7 +63,8 @@ namespace TicTacToeServer.Hubs
             }
 
             await Clients.Group(roomId.ToString()).SendAsync("AllPlayersJoinedToRoom");
-            await _roomService.SetState(roomId, RoomState.InGame);
+            room.State = RoomState.InGame;
+            await _roomService.SaveChangesAsync();
         }
 
         public async Task MakeMove(int i, int j, string playerId, string password)

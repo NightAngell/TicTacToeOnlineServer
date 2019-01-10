@@ -38,6 +38,8 @@ namespace TicTacToeServer
 
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IGuidService, GuidService>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             services.AddDbContext<Db>(options => options.UseSqlServer(
                 @"Server=(localdb)\mssqllocaldb;

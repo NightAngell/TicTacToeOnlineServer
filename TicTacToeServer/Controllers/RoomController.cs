@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TicTacToeServer.DTO;
 using TicTacToeServer.Services;
 
 namespace TicTacToeServer.Controllers
@@ -21,7 +22,7 @@ namespace TicTacToeServer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetListOfRooms()
+        public async Task<ActionResult<List<RoomDto>>> GetListOfRooms()
         {
             return Ok(await _roomService.GetListOfRoomsDtosInLobbyAsync());
         }

@@ -10,14 +10,13 @@ namespace TicTacToeServer.Services
     {
         void AddRoom(Room room);
         void AddRoomWithHostInsideWithInLobbyState(Room room);
-        void DestroyRoom(int roomId);
+        void AttachAndDestroyRoom(int roomId);
         void SaveChanges();
         Task<IEnumerable<Room>> GetListOfRoomsAsync();
         Task<IEnumerable<RoomDto>> GetListOfRoomsDtosInLobbyAsync();
         Room GetRoom(int roomId);
         Task<Room> GetRoomAsync(int roomId);
         Task SaveChangesAsync();
-        Task SetState(int roomId, RoomState state);
         Task<Room> GetRoomWithGameAndGameField(int roomId);
     }
 }
