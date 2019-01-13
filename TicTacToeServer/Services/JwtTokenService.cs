@@ -19,7 +19,7 @@ namespace TicTacToeServer.Services
             _configuration = configuration;
         }
 
-        public JwtSecurityToken GetToken(List<Claim> claims)
+        public JwtSecurityToken GetToken(List<Claim> claims = null)
         {
             var signinKey = new SymmetricSecurityKey(
                   Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]));
