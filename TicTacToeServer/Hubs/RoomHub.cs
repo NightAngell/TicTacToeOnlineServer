@@ -17,12 +17,11 @@ using TicTacToeServer.Hubs.Interfaces;
 namespace TicTacToeServer.Hubs
 {
     public class RoomHub : Hub<IRoomHubResponses>
-    //public class RoomHub : Hub
     {
         //We need use instance of Db here directly, because in OnDisconnectedAsync
         //Db instance from services not exist
         readonly Db _db;
-        const string _roomIdKey = "RoomId";
+        public const string roomIdKey = "RoomId";
 
         readonly IRoomService _roomService;
         readonly object _numberOfPlayersInRoomLock = new object();
@@ -39,7 +38,7 @@ namespace TicTacToeServer.Hubs
             _roomService.AddRoomWithHostInsideWithInLobbyState(room);
             await _roomService.SaveChangesAsync();
             await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
-            this.AddOrUpdateItemInContextItems(_roomIdKey, room.Id);
+            this.AddOrUpdateItemInContextItems(roomIdKey, room.Id);
             await Clients.Caller.HostRoomCreated(room.Id);
         }
 
@@ -85,8 +84,8 @@ namespace TicTacToeServer.Hubs
 
         public async Task AbortRoom()
         {
-            if (!Context.Items.ContainsKey(_roomIdKey)) return;
-            var roomId = (int)Context.Items[_roomIdKey];
+            if (!Context.Items.ContainsKey(roomIdKey)) return;
+            var roomId = (int)Context.Items[roomIdKey];
             
             _roomService.AttachAndDestroyRoom(roomId);
             await _roomService.SaveChangesAsync();
@@ -96,8 +95,8 @@ namespace TicTacToeServer.Hubs
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            if (!Context.Items.ContainsKey(_roomIdKey)) return;
-            int roomId = (int)Context.Items[_roomIdKey];
+            if (!Context.Items.ContainsKey(roomIdKey)) return;
+            int roomId = (int)Context.Items[roomIdKey];
 
             var room = await _db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
             if (room == null)
