@@ -12,15 +12,16 @@ using TicTacToeServer.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using TicTacToeServer.Extensions;
+using TicTacToeServer.Hubs.Interfaces;
 
 namespace TicTacToeServer.Hubs
 {
-    public class RoomHub : Hub
+    public class RoomHub : Hub<IRoomHubResponses>
     {
         //We need use instance of Db here directly, because in OnDisconnectedAsync
         //Db instance from services not exist
         readonly Db _db;
-        const string _roomIdKey = "RoomId";
+        public const string roomIdKey = "RoomId";
 
         readonly IRoomService _roomService;
         readonly object _numberOfPlayersInRoomLock = new object();
@@ -34,31 +35,24 @@ namespace TicTacToeServer.Hubs
         [Authorize]
         public async Task CreateHostRoom(Room room)
         {
-            try
-            {
-                _roomService.AddRoomWithHostInsideWithInLobbyState(room);
-                await _roomService.SaveChangesAsync();
-                await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
-                this.AddOrUpdateItemInContextItems(_roomIdKey, room.Id);
-                await Clients.Caller.SendAsync("HostRoomCreated", room.Id);
-            }catch(Exception e)
-            {
-                // log
-            }
-           
+            _roomService.AddRoomWithHostInsideWithInLobbyState(room);
+            await _roomService.SaveChangesAsync();
+            await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
+            this.AddOrUpdateItemInContextItems(roomIdKey, room.Id);
+            await Clients.Caller.HostRoomCreated(room.Id);
         }
 
         public async Task AddGuestToRoom(int roomId, string password, string guestNick)
         {
             var room = await _roomService.GetRoomAsync(roomId);
             if (room == null) {
-                await Clients.Caller.SendAsync("PlayerCannotJoinToRoom", "Room not exist");
+                await Clients.Caller.PlayerCannotJoinToRoom("Room not exist");
                 return;
             }
 
             if ((password != null || password.Length > 0)
                 && room.Password != password) {
-                await Clients.Caller.SendAsync("PlayerCannotJoinToRoom", "Wrong password");
+                await Clients.Caller.PlayerCannotJoinToRoom("Wrong password");
                 return;
             }
 
@@ -69,7 +63,7 @@ namespace TicTacToeServer.Hubs
                 room = _roomService.GetRoom(roomId);
                 if (room == null || room.NumberOfPlayersInside == 2)
                 {
-                    Clients.Caller.SendAsync("PlayerCannotJoinToRoom", "Room is full or not exist");
+                    Clients.Caller.PlayerCannotJoinToRoom("Room is full or not exist");
                     return;
                 }
 
@@ -84,25 +78,25 @@ namespace TicTacToeServer.Hubs
             }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
-            await Clients.OthersInGroup(roomId.ToString()).SendAsync("GuestJoinToRoom", roomId, hostGuid);
-            await Clients.Caller.SendAsync("GuestJoinToRoom", roomId, guestGuid);
+            await Clients.OthersInGroup(roomId.ToString()).GuestJoinToRoom(roomId, hostGuid);
+            await Clients.Caller.GuestJoinToRoom(roomId, guestGuid);
         }
 
         public async Task AbortRoom()
         {
-            if (!Context.Items.ContainsKey(_roomIdKey)) return;
-            var roomId = (int)Context.Items[_roomIdKey];
+            if (!Context.Items.ContainsKey(roomIdKey)) return;
+            var roomId = (int)Context.Items[roomIdKey];
             
             _roomService.AttachAndDestroyRoom(roomId);
             await _roomService.SaveChangesAsync();
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
-            await Clients.Caller.SendAsync("RoomAborted");
+            await Clients.Caller.RoomAborted();
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            if (!Context.Items.ContainsKey(_roomIdKey)) return;
-            int roomId = (int)Context.Items[_roomIdKey];
+            if (!Context.Items.ContainsKey(roomIdKey)) return;
+            int roomId = (int)Context.Items[roomIdKey];
 
             var room = await _db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
             if (room == null)

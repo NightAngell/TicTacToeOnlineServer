@@ -192,7 +192,7 @@ namespace TicTacToeServerTests.Controllers
 
         //RefreshToken
         [Test]
-        public async Task RefreshToken_TokenRefreshed()
+        public async Task RefreshToken_TokenWithExpirationRefreshed()
         {
             _tokenServiceMock
                 .Setup(x => x.GetToken(It.IsAny<List<Claim>>()))
