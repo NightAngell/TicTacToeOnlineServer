@@ -44,6 +44,9 @@ namespace TicTacToeServerTests.Hubs
             _clientsMock
                 .Setup(x => x.OthersInGroup(It.IsAny<string>()))
                 .Returns(_responsesMock.Object);
+            _clientsMock
+                .Setup(x => x.Group(It.IsAny<string>()))
+                .Returns(_responsesMock.Object);
         }
 
         protected void _verifySomebodyAddedToGroup(Times times)

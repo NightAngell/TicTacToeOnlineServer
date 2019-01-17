@@ -60,6 +60,7 @@ namespace TicTacToeServerTests.Hubs
         {
             _initGameHub(_dbMock.Object);
             await _gameHub.JoinToGame(RoomNotExistId, ValidPlayerId, ValidPassword);
+           
             _clientMock.Verify(x => x.RoomNotExist(), Times.Once);
         }
 
@@ -68,7 +69,7 @@ namespace TicTacToeServerTests.Hubs
         {
             _initGameHub(_dbMock.Object);
             await _gameHub.JoinToGame(RoomNotExistId, ValidPlayerId, ValidPassword);
-            _clientMock.Verify(x => x.OpponentJoinedToGame(), Times.Never);
+            _responsesMock.Verify(x => x.OpponentJoinedToGame(), Times.Never);
         }
 
         [Test]
@@ -143,15 +144,63 @@ namespace TicTacToeServerTests.Hubs
             Assert.True(_existingRoom.Game.CurrentPlayerId.Length > 0);
         }
 
-        //NotifyOpponentImAlreadyInRoom
-        [Test]
-        public async Test NotifyOpponentImAlreadyInRoom
-
         private async Task _initGameHubAndCallJoinToGameWithAllParamsValid()
         {
             _initGameHub(_dbMock.Object);
-            await _gameHub.JoinToGame(RoomExistId, ValidPlayerId, ValidPassword); 
+            await _gameHub.JoinToGame(RoomExistId, ValidPlayerId, ValidPassword);
         }
+
+        //NotifyOpponentImAlreadyInRoom
+        [Test]
+        public async Task NotifyOpponentImAlreadyInRoom_InvalidPlayerIdOrPassword_CallerNotifiedAccesDenied()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.NotifyOpponentImAlreadyInRoom(InvalidPlayerId, InvalidPassword);
+
+            _clientMock.Verify(x => x.AccesDenied(), Times.Once);
+        }
+
+        [Test]
+        public async Task NotifyOpponentImAlreadyInRoom_InvalidPlayerIdOrPassword_GroupNeverNotifiedAllPlayersJoinedToRoom()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+             await _gameHub.NotifyOpponentImAlreadyInRoom(InvalidPlayerId, InvalidPassword);
+
+            _responsesMock.Verify(x => x.AllPlayersJoinedToRoom(), Times.Never);
+        }
+
+        [Test]
+        public async Task NotifyOpponentImAlreadyInRoom_ValidLoginAndPassword_GroupNotifiedAllPlayersJoinedToRoom()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+             await _gameHub.NotifyOpponentImAlreadyInRoom(ValidPlayerId, ValidPassword);
+
+            _responsesMock.Verify(x => x.AllPlayersJoinedToRoom(), Times.Once);
+        }
+
+        [Test]
+        public async Task NotifyOpponentImAlreadyInRoom_ValidLoginAndPassword_RoomChangeStateToInGameAndItsSaved()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.NotifyOpponentImAlreadyInRoom(ValidPlayerId, ValidPassword);
+
+            Assert.AreEqual(_existingRoom.State, RoomState.InGame);
+            _roomServiceMock.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+
+        private void _addRoomIdToContextItemsAndInitGameHub()
+        {
+            _itemsFake.Add(GameHub.RoomIdKey, _existingRoom.Id);
+            _initGameHub(_dbMock.Object);
+        }
+
+        //MakeMove
+        //[Test]
+        //public async MakeMove_
 
         private void  _initGameHub(Db db)
         {
