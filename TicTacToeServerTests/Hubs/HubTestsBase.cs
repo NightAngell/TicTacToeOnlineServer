@@ -1,15 +1,23 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using TicTacToeServer.Hubs.Interfaces;
 
 namespace TicTacToeServerTests.Hubs
 {
     /// <summary>
     /// You must provide [SetUp](if you using Nunit) and call BaseSetUp if you want us this class
+    /// <para>You must assign context, groups and clients mocks object when create hub to tests.</para>
+    /// <list type="bullet">
+    /// <item>Context = _contextMock.Object, </item>
+    /// <item>Groups = _groupsMock.Object, </item>
+    /// <item>Clients = _clientsMock.Object</item>
+    /// </list>
     /// </summary>
     abstract class HubTestsBase<TIHubResponses, TDbContext>
         where TDbContext : DbContext
@@ -36,6 +44,45 @@ namespace TicTacToeServerTests.Hubs
             _clientsMock
                 .Setup(x => x.OthersInGroup(It.IsAny<string>()))
                 .Returns(_responsesMock.Object);
+        }
+
+        protected void _verifySomebodyAddedToGroup(Times times)
+        {
+            _groupsMock
+                .Verify(x => x.AddToGroupAsync(
+                    It.IsAny<string>(), 
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()),
+                    times
+                );
+        }
+
+        protected void _verifySomebodyAddedToGroup(Times times, string groupName)
+        {
+            _groupsMock
+                .Verify(x => x.AddToGroupAsync(
+                    It.IsAny<string>(),
+                    groupName,
+                    It.IsAny<CancellationToken>()),
+                    times
+                );
+        }
+
+        protected void _verifySomebodyAddedToGroup(Times times, string groupName, string connectionId)
+        {
+            _groupsMock
+                .Verify(x => x.AddToGroupAsync(
+                    connectionId,
+                    groupName,
+                    It.IsAny<CancellationToken>()),
+                    times
+                );
+        }
+
+        protected void _verifyContextItemsContainKeyValuePair(object key, object value)
+        {
+            Assert.IsTrue(_itemsFake.ContainsKey(key));
+            Assert.IsTrue(_itemsFake.ContainsValue(value));
         }
     }
 }

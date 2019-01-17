@@ -13,7 +13,7 @@ namespace TicTacToeServer.Hubs
 {
     public class GameHub : Hub<IGameHubResponses>
     {
-        const string _roomIdKey = "RoomId";
+        public const string RoomIdKey = "RoomId";
 
         readonly IGameService _gameService;
         readonly IRoomService _roomService;
@@ -42,7 +42,7 @@ namespace TicTacToeServer.Hubs
             }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
-            Context.Items.Add(_roomIdKey, roomId);
+            Context.Items.Add(RoomIdKey, roomId);
             await Clients.OthersInGroup(roomId.ToString()).OpponentJoinedToGame();
 
             room.InitGame();
@@ -53,7 +53,7 @@ namespace TicTacToeServer.Hubs
 
         public async Task NotifyOpponentImAlreadyInRoom(string playerId, string password)
         {
-            int roomId = (int)Context.Items[_roomIdKey];
+            int roomId = (int)Context.Items[RoomIdKey];
             var room = await _roomService.GetRoomAsync(roomId);
             if (!_gameService.ValidatePlayer(room, playerId, password))
             {
@@ -68,7 +68,7 @@ namespace TicTacToeServer.Hubs
 
         public async Task MakeMove(int i, int j, string playerId, string password)
         {
-            int roomId = (int)Context.Items[_roomIdKey];
+            int roomId = (int)Context.Items[RoomIdKey];
             var room = await _roomService.GetRoomWithGameAndGameField(roomId);
             if (!_gameService.ValidatePlayer(room, playerId, password))
             {
@@ -120,8 +120,8 @@ namespace TicTacToeServer.Hubs
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            if (!Context.Items.ContainsKey(_roomIdKey)) return;
-            int roomId = (int)Context.Items[_roomIdKey];
+            if (!Context.Items.ContainsKey(RoomIdKey)) return;
+            int roomId = (int)Context.Items[RoomIdKey];
             await Clients.Group(roomId.ToString()).OpponentDisconnected();
 
             var room = await _db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
