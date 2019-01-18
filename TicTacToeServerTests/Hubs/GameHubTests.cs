@@ -72,6 +72,9 @@ namespace TicTacToeServerTests.Hubs
             _gameServiceMock
                 .Setup(x => x.IsPlayerTurn(It.IsAny<Game>(), ValidPlayerId))
                 .Returns(true);
+            _gameServiceMock
+               .Setup(x => x.CanMakeMove(It.IsAny<GameField>(), It.IsAny<GameFieldFields>()))
+               .Returns(true);
         }
 
         private void _addToExistingRoomGameWithGameFieldAndCurrentPlayerId()
@@ -313,9 +316,121 @@ namespace TicTacToeServerTests.Hubs
         }
 
         [Test]
-        public async Task MakeMove_RoomIsNotFullAndTherIsNoWinner_()
+        public async Task MakeMove_RoomIsNotFullAndThereIsNoWinner_GroupNotifiedPlayerMadeMove()
         {
-            //TODO
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+
+            _responsesMock.Verify(
+                x => x.PlayerMadeMove(It.IsAny<int>(), It.IsAny<int>()),
+                Times.Once
+            );
+        }
+
+        [Test]
+        public async Task MakeMove_RoomIsNotFullAndThereIsNoWinner_NextPlayerIsSet()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+
+            _gameServiceMock.Verify(x => x.NextPlayerTurn(It.IsAny<Room>()), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_RoomIsNotFullButIsWinner_CallerNotifyWinOthersInGroupNotifyLose()
+        {
+            _gameServiceMock
+                .Setup(x => x.IsWinner(It.IsAny<GameField>()))
+                .Returns(true);
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+
+            _clientMock.Verify(x => x.Win(), Times.Once);
+            _responsesMock.Verify(x => x.Lose(), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_IsDraw_GroupNotifiedDraw()
+        {
+            _gameServiceMock
+                .Setup(x => x.IsWinner(It.IsAny<GameField>()))
+                .Returns(false);
+            _roomServiceMock
+              .Setup(x => x.GetRoomWithGameAndGameField(RoomExistId))
+              .Callback(()=> {
+                  _existingRoom.Game = new Game {
+                      CurrentPlayerId = ValidPlayerId,
+                      Field = _getFullField()
+                  };
+              })
+              .ReturnsAsync(_existingRoom);
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+
+            _responsesMock.Verify(x => x.Draw(), Times.Once);
+        }
+
+        [Test]
+        public  async Task MakeMove_RoomIsFullAndIsWinner_CallerNotifyWinOthersInGroupNotifyLose()
+        {
+            _gameServiceMock
+                .Setup(x => x.IsWinner(It.IsAny<GameField>()))
+                .Returns(true);
+            _roomServiceMock
+              .Setup(x => x.GetRoomWithGameAndGameField(RoomExistId))
+              .Callback(() => {
+                  _existingRoom.Game = new Game
+                  {
+                      CurrentPlayerId = ValidPlayerId,
+                      Field = _getFullField()
+                  };
+              })
+              .ReturnsAsync(_existingRoom);
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+
+            _clientMock.Verify(x => x.Win(), Times.Once);
+            _responsesMock.Verify(x => x.Lose(), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_AllConditionsFine_MakeMoveInvoked()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+
+            _gameServiceMock
+                .Verify(x => x.MakeMove(
+                    It.IsAny<Game>(),
+                    It.IsAny<GameFieldFields>()
+                ),
+                Times.Once
+            );
+        }
+
+        //OnDisconnectedAsync
+
+
+
+        private GameField _getFullField()
+        {
+            return new GameField {
+                Down = "1",
+                DownLeft = "1",
+                DownRight = "1",
+                Middle = "1",
+                MiddleLeft = "1",
+                MiddleRight = "1",
+                Top = "1",
+                TopLeft = "1",
+                TopRight = "1"
+            };
         }
 
         private async Task _makeMove_FieldIsNotEmptyScenario()
