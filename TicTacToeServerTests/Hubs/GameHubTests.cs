@@ -40,9 +40,23 @@ namespace TicTacToeServerTests.Hubs
                 Password = ValidPassword,
                 HostId = ValidPlayerId
             };
+            _roomServiceMockSetups();
+            _gameServiceMockSetups();
+        }
+
+        private void _roomServiceMockSetups()
+        {
             _roomServiceMock
-                .Setup(x => x.GetRoomAsync(RoomExistId))
-                .ReturnsAsync(_existingRoom);
+               .Setup(x => x.GetRoomAsync(RoomExistId))
+               .ReturnsAsync(_existingRoom);
+            _roomServiceMock
+               .Setup(x => x.GetRoomWithGameAndGameField(RoomExistId))
+               .Callback(_addToExistingRoomGameWithGameFieldAndCurrentPlayerId)
+               .ReturnsAsync(_existingRoom);
+        }
+
+        private void _gameServiceMockSetups()
+        {
             _gameServiceMock
                 .Setup(x => x.ValidatePlayer(It.IsAny<Room>(), InvalidPlayerId, ValidPassword))
                 .Returns(false);
@@ -50,8 +64,22 @@ namespace TicTacToeServerTests.Hubs
                 .Setup(x => x.ValidatePlayer(It.IsAny<Room>(), ValidPlayerId, InvalidPassword))
                 .Returns(false);
             _gameServiceMock
+               .Setup(x => x.ValidatePlayer(It.IsAny<Room>(), InvalidPlayerId, InvalidPassword))
+               .Returns(false);
+            _gameServiceMock
                 .Setup(x => x.ValidatePlayer(It.IsAny<Room>(), ValidPlayerId, ValidPassword))
                 .Returns(true);
+            _gameServiceMock
+                .Setup(x => x.IsPlayerTurn(It.IsAny<Game>(), ValidPlayerId))
+                .Returns(true);
+        }
+
+        private void _addToExistingRoomGameWithGameFieldAndCurrentPlayerId()
+        {
+            _existingRoom.Game = new Game {
+                CurrentPlayerId = ValidPlayerId,
+                Field = new GameField()
+            };
         }
 
         //JoinToGame
@@ -199,8 +227,112 @@ namespace TicTacToeServerTests.Hubs
         }
 
         //MakeMove
-        //[Test]
-        //public async MakeMove_
+        [Test]
+        public async Task MakeMove_InvalidLogin_CallerGetAccesDenied()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, InvalidPlayerId, ValidPassword);
+
+            _clientMock.Verify(x => x.AccesDenied(), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_InvalidPassword_CallerGetAccesDenied()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, InvalidPassword);
+
+            _clientMock.Verify(x => x.AccesDenied(), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_InvalidPasswordAndLogin_CallerGetAccesDenied()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, InvalidPassword);
+
+            _clientMock.Verify(x => x.AccesDenied(), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_InvalidCredintials_GroupNeverGetPlayerMadeMove()
+        {
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, InvalidPassword);
+            _verifyGroupNeverGetPlayerMadeMove();
+             await _gameHub.MakeMove(1, 1, InvalidPlayerId, ValidPassword);
+            _verifyGroupNeverGetPlayerMadeMove();
+            await _gameHub.MakeMove(1, 1, InvalidPlayerId, InvalidPassword);
+            _verifyGroupNeverGetPlayerMadeMove();
+        }
+
+        [Test]
+        public async Task MakeMove_IsNotPlayerTurn_CallerGetNotYourTurnNotification()
+        {
+            await _makeMove_IsNotPlayerTurnScenario();
+
+            _clientMock.Verify(x => x.NotYourTurn(It.IsAny<string>()), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_IsNotPlayerTurn_GropuNeverGetPlayerMadeMove()
+        {
+            await _makeMove_IsNotPlayerTurnScenario();
+
+            _verifyGroupNeverGetPlayerMadeMove();
+        }
+
+        private async Task _makeMove_IsNotPlayerTurnScenario()
+        {
+            _gameServiceMock
+               .Setup(x => x.IsPlayerTurn(It.IsAny<Game>(), It.IsAny<string>()))
+               .Returns(false);
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+        }
+
+        [Test]
+        public async Task MakeMove_FieldIsNotEmpty_CallerGetFieldAlreadyOccupied()
+        {
+            await _makeMove_FieldIsNotEmptyScenario();
+
+            _clientMock.Verify(x => x.FieldAlreadyOccupied(It.IsAny<string>()), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_FieldIsNotEmpty_GropuNeverGetPlayerMadeMove()
+        {
+            await _makeMove_FieldIsNotEmptyScenario();
+
+            _clientMock.Verify(x => x.FieldAlreadyOccupied(It.IsAny<string>()), Times.Once);
+        }
+
+        [Test]
+        public async Task MakeMove_RoomIsNotFullAndTherIsNoWinner_()
+        {
+            //TODO
+        }
+
+        private async Task _makeMove_FieldIsNotEmptyScenario()
+        {
+            _gameServiceMock
+                .Setup(x => x.CanMakeMove(It.IsAny<GameField>(), It.IsAny<GameFieldFields>()))
+                .Returns(false);
+            _addRoomIdToContextItemsAndInitGameHub();
+
+            await _gameHub.MakeMove(1, 1, ValidPlayerId, ValidPassword);
+        }
+
+        private void _verifyGroupNeverGetPlayerMadeMove()
+        {
+            _responsesMock
+               .Verify(x => x.PlayerMadeMove(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        }
 
         private void  _initGameHub(Db db)
         {
