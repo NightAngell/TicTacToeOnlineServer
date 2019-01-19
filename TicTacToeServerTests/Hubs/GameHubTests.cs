@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TestSupport.EfHelpers;
 using TicTacToeServer.Database;
 using TicTacToeServer.Enums;
 using TicTacToeServer.Hubs;
@@ -415,8 +416,38 @@ namespace TicTacToeServerTests.Hubs
         }
 
         //OnDisconnectedAsync
+        [Test]
+        public async Task OnDisconnectedAsync_GroupNotifiedOpponentDisconnected()
+        {
+            _itemsFake.Add(GameHub.RoomIdKey, _existingRoom.Id);
+            using (var db = new Db(SqliteInMemory.CreateOptions<Db>()))
+            {
+                await db.Database.EnsureCreatedAsync();
+                _initGameHub(db);
+                await _gameHub.OnDisconnectedAsync(null);
 
+                _responsesMock
+                    .Verify(x => x.OpponentDisconnected(), Times.Once);
+            }
+        }
 
+        [Test]
+        public async Task OnDisconnectedAsync_RoomExist_RoomDestroyed()
+        {
+            _itemsFake.Add(GameHub.RoomIdKey, _existingRoom.Id);
+            using (var db = new Db(SqliteInMemory.CreateOptions<Db>()))
+            {
+                await db.Database.EnsureCreatedAsync();
+                db.Rooms.Add(_existingRoom);
+                await db.SaveChangesAsync();
+                int id = _existingRoom.Id;
+                _initGameHub(db);
+
+                await _gameHub.OnDisconnectedAsync(null);
+
+                Assert.IsNull(db.Rooms.Find(id));
+            }
+        }
 
         private GameField _getFullField()
         {
