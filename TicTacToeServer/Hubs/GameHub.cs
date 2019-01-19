@@ -7,12 +7,13 @@ using TicTacToeServer.Database;
 using TicTacToeServer.Enums;
 using TicTacToeServer.Services;
 using Microsoft.EntityFrameworkCore;
+using TicTacToeServer.Hubs.Interfaces;
 
 namespace TicTacToeServer.Hubs
 {
-    public class GameHub : Hub
+    public class GameHub : Hub<IGameHubResponses>
     {
-        const string _roomIdKey = "RoomId";
+        public const string RoomIdKey = "RoomId";
 
         readonly IGameService _gameService;
         readonly IRoomService _roomService;
@@ -27,34 +28,32 @@ namespace TicTacToeServer.Hubs
 
         public async Task JoinToGame(int roomId, string playerId, string password)
         {
-            try
+            var room = await _roomService.GetRoomAsync(roomId);
+            if (room == null)
             {
-                var room = await _roomService.GetRoomAsync(roomId);
-                if (!_gameService.ValidatePlayer(room, playerId, password))
-                {
-                    await _notifyCallerAccesDenied();
-                    return;
-                }
-
-                await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
-                Context.Items.Add(_roomIdKey, roomId);
-                await Clients.OthersInGroup(roomId.ToString()).SendAsync("OpponentJoinedToGame");
-
-                room.InitGame();
-                room.State = RoomState.WaitingForSecondPlayer;
-                room.Game.CurrentPlayerId = room.HostId;
-                await _roomService.SaveChangesAsync();
-            }
-            catch(Exception ex)
-            {
-                //log
+                await Clients.Caller.RoomNotExist();
+                return;
             }
             
+            if (!_gameService.ValidatePlayer(room, playerId, password))
+            {
+                await _notifyCallerAccesDenied();
+                return;
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
+            Context.Items.Add(RoomIdKey, roomId);
+            await Clients.OthersInGroup(roomId.ToString()).OpponentJoinedToGame();
+
+            room.InitGame();
+            room.State = RoomState.WaitingForSecondPlayer;
+            room.Game.CurrentPlayerId = room.HostId;
+            await _roomService.SaveChangesAsync();
         }
 
         public async Task NotifyOpponentImAlreadyInRoom(string playerId, string password)
         {
-            int roomId = (int)Context.Items[_roomIdKey];
+            int roomId = (int)Context.Items[RoomIdKey];
             var room = await _roomService.GetRoomAsync(roomId);
             if (!_gameService.ValidatePlayer(room, playerId, password))
             {
@@ -62,14 +61,14 @@ namespace TicTacToeServer.Hubs
                 return;
             }
 
-            await Clients.Group(roomId.ToString()).SendAsync("AllPlayersJoinedToRoom");
+            await Clients.Group(roomId.ToString()).AllPlayersJoinedToRoom();
             room.State = RoomState.InGame;
             await _roomService.SaveChangesAsync();
         }
 
         public async Task MakeMove(int i, int j, string playerId, string password)
         {
-            int roomId = (int)Context.Items[_roomIdKey];
+            int roomId = (int)Context.Items[RoomIdKey];
             var room = await _roomService.GetRoomWithGameAndGameField(roomId);
             if (!_gameService.ValidatePlayer(room, playerId, password))
             {
@@ -79,7 +78,7 @@ namespace TicTacToeServer.Hubs
 
             if (!_gameService.IsPlayerTurn(room.Game, playerId))
             {
-                await Clients.Caller.SendAsync("NotYourTurn", "It`s not your turn now!");
+                await Clients.Caller.NotYourTurn("It`s not your turn now!");
                 return;
             }
 
@@ -87,7 +86,7 @@ namespace TicTacToeServer.Hubs
 
             if (!_gameService.CanMakeMove(room.Game.Field, simpleField))
             {
-                await Clients.Caller.SendAsync("FieldAlreadyOccupied", "This field is not empty");
+                await Clients.Caller.FieldAlreadyOccupied("This field is not empty");
                 return;
             }
 
@@ -97,18 +96,18 @@ namespace TicTacToeServer.Hubs
             {
                 if (_gameService.IsWinner(room.Game.Field))
                 {
-                    await Clients.Caller.SendAsync("Win");
-                    await Clients.OthersInGroup(roomId.ToString()).SendAsync("Lose");
+                    await Clients.Caller.Win();
+                    await Clients.OthersInGroup(roomId.ToString()).Lose();
                 }
                 else
                 {
-                    await Clients.Group(roomId.ToString()).SendAsync("Draw");
+                    await Clients.Group(roomId.ToString()).Draw();
                 }
             }
             else if(_gameService.IsWinner(room.Game.Field))
             {
-                await Clients.Caller.SendAsync("Win");
-                await Clients.OthersInGroup(roomId.ToString()).SendAsync("Lose");
+                await Clients.Caller.Win();
+                await Clients.OthersInGroup(roomId.ToString()).Lose();
             }
 
             _gameService.NextPlayerTurn(room);
@@ -116,14 +115,14 @@ namespace TicTacToeServer.Hubs
 
             await Clients
                 .Group(roomId.ToString())
-                .SendAsync("PlayerMadeMove", i, j);
+                .PlayerMadeMove(i, j);
         }
 
         public async override Task OnDisconnectedAsync(Exception exception)
         {
-            if (!Context.Items.ContainsKey(_roomIdKey)) return;
-            int roomId = (int)Context.Items[_roomIdKey];
-            await Clients.Group(roomId.ToString()).SendAsync("OpponentDisconnected");
+            if (!Context.Items.ContainsKey(RoomIdKey)) return;
+            int roomId = (int)Context.Items[RoomIdKey];
+            await Clients.Group(roomId.ToString()).OpponentDisconnected();
 
             var room = await _db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
             if (room == null)
@@ -137,7 +136,7 @@ namespace TicTacToeServer.Hubs
 
         private async Task _notifyCallerAccesDenied()
         {
-            await Clients.Caller.SendAsync("AccedDenied");
+            await Clients.Caller.AccesDenied();
         }
     }
 }

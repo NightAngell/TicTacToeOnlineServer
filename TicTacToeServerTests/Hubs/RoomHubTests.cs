@@ -23,7 +23,7 @@ namespace TicTacToeServerTests.Hubs
     ///  <see cref="IRoomHubResponses"/>
     /// </summary>
     [TestFixture]
-    class RoomHubTests
+    class RoomHubTests : HubTestsBase<IRoomHubResponses, Db>
     {
         private const string GuestNick = "guestNick";
         private const int ExistingRoomId = 5;
@@ -32,33 +32,16 @@ namespace TicTacToeServerTests.Hubs
         private const int NonExistingRoomId = 1;
         RoomHub _roomHub;
         Mock<IRoomService> _roomServiceMock;
-        Mock<HubCallerContext> _contextMock;
-        Mock<IGroupManager> _groupsMock;
-        Mock<IHubCallerClients<IRoomHubResponses>> _clientsMock;
         Room _lobbyRoom;
-        Dictionary<object, object> _itemsFake;
-        Mock<IRoomHubResponses> _clientMock;
-        Mock<Db> _dbMock = new Mock<Db>(new DbContextOptions<Db>());
         readonly string _connectionId = "id1";
-        Mock<IRoomHubResponses> _roomHubResponsesMock;
 
         [SetUp]
         public void SetUp()
         {
+            BaseSetUp();
             _lobbyRoom = new Room() { HostNick = "nickhost" };
             _roomServiceMock = new Mock<IRoomService>();
-            _contextMock = new Mock<HubCallerContext>();
-            _groupsMock = new Mock<IGroupManager>();
-            _itemsFake = new Dictionary<object, object>();
-            _clientMock = new Mock<IRoomHubResponses>();
-            _clientsMock = new Mock<IHubCallerClients<IRoomHubResponses>>();
-            _clientsMock.Setup(x => x.Caller).Returns(_clientMock.Object);
-            _roomHubResponsesMock = new Mock<IRoomHubResponses>();
-            _clientsMock
-                .Setup(x => x.OthersInGroup(It.IsAny<string>()))
-                .Returns(_roomHubResponsesMock.Object);
             _roomServiceMockSetup();
-           
         }
 
         private void _roomServiceMockSetup()
@@ -250,11 +233,11 @@ namespace TicTacToeServerTests.Hubs
                 x => x.GuestJoinToRoom(ExistingRoomId, It.IsAny<string>()),
                 Times.Once
             );
-            _roomHubResponsesMock.Verify(
+            _responsesMock.Verify(
                 x => x.GuestJoinToRoom(It.IsAny<int>(), It.IsAny<string>()),
                 Times.Once
             );
-            _roomHubResponsesMock.Verify(
+            _responsesMock.Verify(
                 x => x.GuestJoinToRoom(ExistingRoomId, It.IsAny<string>()),
                 Times.Once
             );

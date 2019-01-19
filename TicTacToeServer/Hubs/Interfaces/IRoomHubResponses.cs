@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TicTacToeServer.Hubs.Interfaces
 {
-    public interface IRoomHubResponses
+    public interface IRoomHubResponses : IHubResponsesConstraint
     {
         Task HostRoomCreated(int roomId);
         Task PlayerCannotJoinToRoom(string reason);
