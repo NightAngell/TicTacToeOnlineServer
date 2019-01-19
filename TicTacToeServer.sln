@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28307.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicTacToeServer", "TicTacToeServer\TicTacToeServer.csproj", "{953C5CAD-5BA3-4D46-9C1D-ED8E0AD5A35D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToeServerTests", "TicTacToeServerTests\TicTacToeServerTests.csproj", "{EEEF81A2-0579-43FD-A721-DE75FA3D4842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicTacToeServerTests", "TicTacToeServerTests\TicTacToeServerTests.csproj", "{EEEF81A2-0579-43FD-A721-DE75FA3D4842}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToeSeleniumTests", "TicTacToeSeleniumTests\TicTacToeSeleniumTests.csproj", "{BB20B267-F055-41F3-B870-9CA7A2FCAB4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{EEEF81A2-0579-43FD-A721-DE75FA3D4842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEEF81A2-0579-43FD-A721-DE75FA3D4842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEEF81A2-0579-43FD-A721-DE75FA3D4842}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB20B267-F055-41F3-B870-9CA7A2FCAB4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB20B267-F055-41F3-B870-9CA7A2FCAB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB20B267-F055-41F3-B870-9CA7A2FCAB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB20B267-F055-41F3-B870-9CA7A2FCAB4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
