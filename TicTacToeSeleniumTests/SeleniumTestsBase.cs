@@ -13,8 +13,8 @@ namespace TicTacToeSeleniumTests
     {
         protected RemoteWebDriver _getNewInstanceOfRequiredDriver()
         {
-            //Config.UseChromeType();
-            return (RemoteWebDriver)Activator.CreateInstance(Config.CurrentWebDriverType, Config.pathToDrivers);
+            //return new FirefoxDriver(SeleniumConfig.pathToDrivers);
+            return new ChromeDriver(SeleniumConfig.pathToDrivers);
         }
 
         protected void _verifyIfElementExistAfter(TimeSpan timeout, RemoteWebDriver driver, By by)
@@ -28,41 +28,18 @@ namespace TicTacToeSeleniumTests
         /// </summary>
         protected void _verifyUserIsRedirected(string partOfUrlAfterBase, RemoteWebDriver driver)
         {
-            new WebDriverWait(driver, Config.BaseTimeout)
+            new WebDriverWait(driver, SeleniumConfig.BaseTimeout)
                     .Until(ExpectedConditions.UrlContains(partOfUrlAfterBase));
         }
 
         protected void _waitForElement(RemoteWebDriver driver, By by)
         {
-            new WebDriverWait(driver, Config.BaseTimeout)
+            new WebDriverWait(driver, SeleniumConfig.BaseTimeout)
                     .Until(ExpectedConditions.ElementExists(by));
         }
 
-        public static class Config
+        public static class SeleniumConfig
         {
-            /// <summary>
-            /// Web driver to all selenium tests. Default is firefox driver type.
-            /// </summary>
-            public static Type CurrentWebDriverType { get; private set; } = typeof(FirefoxDriver);
-
-            public static void UseFirefoxType()
-            {
-                CurrentWebDriverType = typeof(FirefoxDriver);
-            }
-
-            public static void UseChromeType()
-            {
-                CurrentWebDriverType = typeof(ChromeDriver);
-            }
-
-            /// <summary>
-            /// It must implement RemoteWebDriver
-            /// </summary>
-            public static void UseCustomWebDriverType(RemoteWebDriver driver)
-            {
-                CurrentWebDriverType = driver.GetType();
-            }
-
             public static TimeSpan BaseTimeout { get; set; } = TimeSpan.FromSeconds(40);
             //#warning Remember to change pathToDrivers to your own
             public static string pathToDrivers = @"C:\Users\Mateusz Sobo\Desktop\Studium dyplomowe\TicTacToeOnlineServer\TicTacToeSeleniumTests\bin\Debug\netcoreapp2.1";

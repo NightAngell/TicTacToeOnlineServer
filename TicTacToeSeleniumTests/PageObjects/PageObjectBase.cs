@@ -14,7 +14,7 @@ namespace TicTacToeSeleniumTests.PageObjects
         {
             _driver = driver;
             _addressAfterBaseAddress = addressAfterBaseAddress;
-            PageFactory.InitElements(_driver, this);
+            PageFactory.InitElements(driver, this);
         }
 
         public void Navigate()

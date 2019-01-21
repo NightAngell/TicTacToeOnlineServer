@@ -37,7 +37,7 @@ namespace TicTacToeSeleniumTests.Auth
         }
 
         [Test]
-        public void WeHaveInvalidLogin_UserSeeEmailInvalidInfoDiv()
+        public void WeHaveInvalidLogin_UserSeeEmailInvalidInfoDivAndSubmitButtonIsDisabled()
         {
             using (var driver = _getNewInstanceOfRequiredDriver())
             {
@@ -47,11 +47,12 @@ namespace TicTacToeSeleniumTests.Auth
                 loginPage.PasswordInput.Click();
 
                 Assert.IsTrue(loginPage.EmailInvalidInfoDiv.Displayed);
+                Assert.IsFalse(loginPage.SubmitButton.Enabled);
             }
         }
 
         [Test]
-        public void WeHaveTooShortPassword_UserSeePasswordInvalidInfoDiv()
+        public void WeHaveTooShortPassword_UserSeePasswordInvalidInfoDivAndSubmitButtonIsDisabled()
         {
             using (var driver = _getNewInstanceOfRequiredDriver())
             {
@@ -61,6 +62,7 @@ namespace TicTacToeSeleniumTests.Auth
                 loginPage.LoginInput.Click();
 
                 Assert.IsTrue(loginPage.PasswordInvalidInfoDiv.Displayed);
+                Assert.IsFalse(loginPage.SubmitButton.Enabled);
             }
         }
 
