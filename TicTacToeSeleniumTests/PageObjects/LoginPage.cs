@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
 using SeleniumExtras.PageObjects;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,8 @@ using System.Text;
 namespace TicTacToeSeleniumTests.PageObjects
 {
 
-    class LoginPage
+    class LoginPage : PageObjectBase
     {
-        protected readonly IWebDriver _driver;
         public const string loginCssSelector = "app-loginandregistration > form > input[name='email']";
         public const string passwordCssSelector = "app-loginandregistration > form > input[name='password']";
         public const string submitButtonCssSelector = "app-loginandregistration > form > input[type='submit']";
@@ -18,10 +18,8 @@ namespace TicTacToeSeleniumTests.PageObjects
         public const string wrongLoginOrPasswordInfoDivSelector = "div[wrongLoginOrPasswordInfo]";
         public const string redirectLinkDivSelector = "div[routerLink='/registration']";
 
-        public LoginPage(IWebDriver driver)
+        public LoginPage(RemoteWebDriver driver) : base (driver, "login")
         {
-            _driver = driver;
-            PageFactory.InitElements(_driver, this);
         }
 
         [FindsBy(How = How.CssSelector, Using = loginCssSelector)]
@@ -44,12 +42,5 @@ namespace TicTacToeSeleniumTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = redirectLinkDivSelector)]
         public IWebElement RedirectToRegistrationDiv { get; set; }
-
-        public void Navigate()
-        {
-            _driver
-                .Navigate()
-                .GoToUrl("http://localhost:4200/login");
-        }
     }
 }
