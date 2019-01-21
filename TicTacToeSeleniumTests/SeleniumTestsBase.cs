@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Support.UI;
@@ -13,6 +14,7 @@ namespace TicTacToeSeleniumTests
     {
         protected RemoteWebDriver _getNewInstanceOfRequiredDriver()
         {
+            //return new EdgeDriver(SeleniumConfig.pathToDrivers);
             //return new FirefoxDriver(SeleniumConfig.pathToDrivers);
             return new ChromeDriver(SeleniumConfig.pathToDrivers);
         }
@@ -41,7 +43,7 @@ namespace TicTacToeSeleniumTests
         public static class SeleniumConfig
         {
             public static TimeSpan BaseTimeout { get; set; } = TimeSpan.FromSeconds(40);
-            //#warning Remember to change pathToDrivers to your own
+            #warning Remember to change pathToDrivers to your own
             public static string pathToDrivers = @"C:\Users\Mateusz Sobo\Desktop\Studium dyplomowe\TicTacToeOnlineServer\TicTacToeSeleniumTests\bin\Debug\netcoreapp2.1";
         }
     }
