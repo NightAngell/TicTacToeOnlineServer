@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using TicTacToeSeleniumTests.PageObjects;
 
-namespace TicTacToeSeleniumTests.Auth
+namespace TicTacToeSeleniumTests.Tests
 {
     [TestFixture]
     class TicTacToeSingleplayerTests : SeleniumWithWorkingAuthBase
@@ -37,6 +37,9 @@ namespace TicTacToeSeleniumTests.Auth
             }
         }
 
+        /// <summary>
+        ///  It require short delay, because browser need time to refresh
+        /// </summary>
         private void _clickIfEmptyAndModalOkButtonStillNotExist(
             IWebElement button, 
             TicTacToeSingleplayerPage page,

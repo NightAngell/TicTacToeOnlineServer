@@ -9,7 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using TicTacToeServer.Models;
 
-namespace TicTacToeSeleniumTests.Auth
+namespace TicTacToeSeleniumTests.Tests
 {
     [TestFixture]
     class RegistrationTests : SeleniumTestsBase

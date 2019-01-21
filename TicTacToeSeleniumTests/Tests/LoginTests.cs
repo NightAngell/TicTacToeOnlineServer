@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using TicTacToeSeleniumTests.PageObjects;
 
-namespace TicTacToeSeleniumTests.Auth
+namespace TicTacToeSeleniumTests.Tests
 {
     [TestFixture]
     class LoginTests : SeleniumTestsBase
