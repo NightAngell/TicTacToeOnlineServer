@@ -42,10 +42,7 @@ namespace TicTacToeServer
             services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             services.AddDbContext<Db>(options => options.UseSqlServer(
-                @"Server=(localdb)\mssqllocaldb;
-                Database=TicTacToeProject;
-                Trusted_Connection=True;
-                ConnectRetryCount=0"
+                Db.connectionString
              ));
 
             _addIdentity(services);

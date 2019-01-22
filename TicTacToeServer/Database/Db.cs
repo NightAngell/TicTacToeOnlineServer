@@ -11,6 +11,12 @@ namespace TicTacToeServer.Database
 {
     public class Db : IdentityDbContext<AppUser>
     {
+        public const string connectionString = 
+               @"Server=(localdb)\mssqllocaldb;
+                 Database=TicTacToeProject;
+                 Trusted_Connection=True;
+                 ConnectRetryCount=0";
+
         public Db(DbContextOptions<Db> options): base(options){ }
 
         public DbSet<Room> Rooms { get; set; }

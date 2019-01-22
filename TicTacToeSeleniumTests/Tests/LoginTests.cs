@@ -9,20 +9,15 @@ using System.Collections.Generic;
 using System.Text;
 using TicTacToeSeleniumTests.PageObjects;
 
-namespace TicTacToeSeleniumTests.Auth
+namespace TicTacToeSeleniumTests.Tests
 {
     [TestFixture]
-    class LoginTests
+    class LoginTests : SeleniumTestsBase
     {
-        private RemoteWebDriver _getRequiredDriver()
-        {
-            return new FirefoxDriver(Environment.CurrentDirectory);
-        }
-
         [Test]
         public void WeHaveValidLoginAndPassword_UserLoggedIn()
         {
-            using (var driver = _getRequiredDriver())
+            using (var driver = _getNewInstanceOfRequiredDriver())
             {
                 var loginPage = new LoginPage(driver);
                 loginPage.Navigate();
@@ -31,8 +26,10 @@ namespace TicTacToeSeleniumTests.Auth
                 loginPage.SubmitButton.Submit();
 
                 //Check it logout button exist, If yes, user is logged in
-                new WebDriverWait(driver, TimeSpan.FromSeconds(40))
-                    .Until(ExpectedConditions.ElementExists(By.CssSelector(".logout")));
+                _verifyIfElementExistAfter(
+                    TimeSpan.FromSeconds(40), 
+                    driver, 
+                    By.CssSelector(".logout"));
 
                 //Clear after test
                 driver.FindElementByClassName("logout").Click();
@@ -40,9 +37,9 @@ namespace TicTacToeSeleniumTests.Auth
         }
 
         [Test]
-        public void WeHaveInvalidLogin_UserSeeEmailInvalidInfoDiv()
+        public void WeHaveInvalidLogin_UserSeeEmailInvalidInfoDivAndSubmitButtonIsDisabled()
         {
-            using (var driver = _getRequiredDriver())
+            using (var driver = _getNewInstanceOfRequiredDriver())
             {
                 var loginPage = new LoginPage(driver);
                 loginPage.Navigate();
@@ -50,13 +47,14 @@ namespace TicTacToeSeleniumTests.Auth
                 loginPage.PasswordInput.Click();
 
                 Assert.IsTrue(loginPage.EmailInvalidInfoDiv.Displayed);
+                Assert.IsFalse(loginPage.SubmitButton.Enabled);
             }
         }
 
         [Test]
-        public void WeHaveTooShortPassword_UserSeePasswordInvalidInfoDiv()
+        public void WeHaveTooShortPassword_UserSeePasswordInvalidInfoDivAndSubmitButtonIsDisabled()
         {
-            using (var driver = _getRequiredDriver())
+            using (var driver = _getNewInstanceOfRequiredDriver())
             {
                 var loginPage = new LoginPage(driver);
                 loginPage.Navigate();
@@ -64,13 +62,14 @@ namespace TicTacToeSeleniumTests.Auth
                 loginPage.LoginInput.Click();
 
                 Assert.IsTrue(loginPage.PasswordInvalidInfoDiv.Displayed);
+                Assert.IsFalse(loginPage.SubmitButton.Enabled);
             }
         }
 
         [Test]
         public void LoginIsValidEmailButPasswordIsInvalidInAccounContext_UserSeeWrongLoginOrPasswordDiv()
         {
-            using (var driver = _getRequiredDriver())
+            using (var driver = _getNewInstanceOfRequiredDriver())
             {
                 var loginPage = new LoginPage(driver);
                 loginPage.Navigate();
@@ -78,10 +77,10 @@ namespace TicTacToeSeleniumTests.Auth
                 loginPage.LoginInput.SendKeys(LoginAndPassword.Login);
                 loginPage.SubmitButton.Submit();
 
-                new WebDriverWait(driver, TimeSpan.FromSeconds(40))
-                    .Until(ExpectedConditions.ElementExists(
-                        By.CssSelector(LoginPage.wrongLoginOrPasswordInfoDivSelector))
-                    );
+                _waitForElement(
+                    driver,
+                    By.CssSelector(LoginPage.wrongLoginOrPasswordInfoDivSelector)
+                 );
 
                 Assert.IsTrue(loginPage.WrongLoginOrPasswordDiv.Displayed);
             } 
@@ -90,15 +89,13 @@ namespace TicTacToeSeleniumTests.Auth
         [Test]
         public void UserClickToRedirectToRegistrationButton_UserRedirectedToRegistrationPage()
         {
-            using (var driver = _getRequiredDriver())
+            using (var driver = _getNewInstanceOfRequiredDriver())
             {
                 var loginPage = new LoginPage(driver);
                 loginPage.Navigate();
                 loginPage.RedirectToRegistrationDiv.Click();
 
-                //Check if user is redirected to registration page
-                new WebDriverWait(driver, TimeSpan.FromSeconds(40))
-                    .Until(ExpectedConditions.UrlContains("registration"));
+                _verifyUserIsRedirected("registration", driver);
             }
         }
     }
