@@ -72,11 +72,76 @@ namespace TicTacToeSeleniumTests.Tests
                 _verifyUserIsRedirected("multiplayerGame", hostDriver);
                 _verifyUserIsRedirected("multiplayerGame", guestDriver);
 
-                hostLobbyPage.Navigate();
-                LogOut(hostDriver);
-                guestLobbyPage.Navigate();
-                LogOut(guestDriver);
+                _logoutBothPlayers(hostDriver, guestDriver, hostLobbyPage, guestLobbyPage);
             }
+        }
+
+        [Test]
+        public void GuestClickOnRoomButRoomWasAbortedByHostLittleEarlier_GuestSeeRoomNotExistError()
+        {
+            using (var hostDriver = _getNewInstanceOfRequiredDriver())
+            using (var guestDriver = _getNewInstanceOfRequiredDriver())
+            {
+                LobbyPage hostLobbyPage, guestLobbyPage;
+                _loginBothPlayersAndNavigateThemToLobby(hostDriver, guestDriver, out hostLobbyPage, out guestLobbyPage);
+
+                hostLobbyPage.HostButton.Click();
+                _waitForElement(hostDriver, By.ClassName(LobbyPage.modalContentClassName));
+                guestLobbyPage.RefreshButton.Click();
+                _waitForElement(guestDriver, By.CssSelector(LobbyPage.firstRoomInLobbySelector));
+                hostLobbyPage.ModalAbortButton.Click();
+                guestLobbyPage.FirstRoom.Click();
+
+                _waitForElement(guestDriver, By.CssSelector(LobbyPage.infoModalInfoDivSelector));
+                Assert.IsTrue(guestLobbyPage.InfoModalInfoDiv.Text.Contains("Room not exist"));
+
+                _logoutBothPlayers(hostDriver, guestDriver, hostLobbyPage, guestLobbyPage);
+            }
+        }
+
+        [Test]
+        [TestCase("( ͡° ʖ̯ ͡°)")]
+        [TestCase("")]
+        public void HostCreateRoomWithPasswordGuestTryGetAccessWithWrongPasswod_GuestSeeWrongPasswordError(string guestPassword)
+        {
+            using (var hostDriver = _getNewInstanceOfRequiredDriver())
+            using (var guestDriver = _getNewInstanceOfRequiredDriver())
+            {
+                LobbyPage hostLobbyPage, guestLobbyPage;
+                _loginBothPlayersAndNavigateThemToLobby(hostDriver, guestDriver, out hostLobbyPage, out guestLobbyPage);
+
+                hostLobbyPage.PasswordInput.SendKeys("TruePassword");
+                hostLobbyPage.HostButton.Click();
+                _waitForElement(hostDriver, By.ClassName(LobbyPage.modalContentClassName));
+                guestLobbyPage.RefreshButton.Click();
+                _waitForElement(guestDriver, By.CssSelector(LobbyPage.firstRoomInLobbySelector));
+                guestLobbyPage.PasswordInput.SendKeys(guestPassword);
+                guestLobbyPage.FirstRoom.Click();
+                _waitForElement(guestDriver, By.CssSelector(LobbyPage.infoModalInfoDivSelector));
+
+                Assert.IsTrue(guestLobbyPage.InfoModalInfoDiv.Text.Contains("Wrong password"));
+
+                hostLobbyPage.ModalAbortButton.Click();
+                _logoutBothPlayers(hostDriver, guestDriver, hostLobbyPage, guestLobbyPage);
+            }
+        }
+
+        private void _loginBothPlayersAndNavigateThemToLobby(RemoteWebDriver hostDriver, RemoteWebDriver guestDriver, out LobbyPage hostLobbyPage, out LobbyPage guestLobbyPage)
+        {
+            LogIn(hostDriver);
+            LogIn(guestDriver);
+            hostLobbyPage = new LobbyPage(hostDriver);
+            hostLobbyPage.Navigate();
+            guestLobbyPage = new LobbyPage(guestDriver);
+            guestLobbyPage.Navigate();
+        }
+
+        private void _logoutBothPlayers(RemoteWebDriver hostDriver, RemoteWebDriver guestDriver, LobbyPage hostLobbyPage, LobbyPage guestLobbyPage)
+        {
+            hostLobbyPage.Navigate();
+            LogOut(hostDriver);
+            guestLobbyPage.Navigate();
+            LogOut(guestDriver);
         }
 
         private void _startGameUsingLobby(RemoteWebDriver hostDriver, RemoteWebDriver guestDriver, out LobbyPage hostLobbyPage, out LobbyPage guestLobbyPage)
