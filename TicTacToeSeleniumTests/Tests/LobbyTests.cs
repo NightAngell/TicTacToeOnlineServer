@@ -66,18 +66,8 @@ namespace TicTacToeSeleniumTests.Tests
             {
                 LogIn(hostDriver);
                 LogIn(guestDriver);
-
-                var hostLobbyPage = new LobbyPage(hostDriver);
-                hostLobbyPage.Navigate();
-                var guestLobbyPage = new LobbyPage(guestDriver);
-                guestLobbyPage.Navigate();
-
-                hostLobbyPage.HostButton.Click();
-                _waitForElement(hostDriver, By.ClassName(LobbyPage.modalContentClassName));
-
-                guestLobbyPage.RefreshButton.Click();
-                _waitForElement(guestDriver, By.CssSelector(LobbyPage.firstRoomInLobbySelector));
-                guestLobbyPage.FirstRoom.Click();
+                LobbyPage hostLobbyPage, guestLobbyPage;
+                _startGameUsingLobby(hostDriver, guestDriver, out hostLobbyPage, out guestLobbyPage);
 
                 _verifyUserIsRedirected("multiplayerGame", hostDriver);
                 _verifyUserIsRedirected("multiplayerGame", guestDriver);
@@ -87,6 +77,21 @@ namespace TicTacToeSeleniumTests.Tests
                 guestLobbyPage.Navigate();
                 LogOut(guestDriver);
             }
+        }
+
+        private void _startGameUsingLobby(RemoteWebDriver hostDriver, RemoteWebDriver guestDriver, out LobbyPage hostLobbyPage, out LobbyPage guestLobbyPage)
+        {
+            hostLobbyPage = new LobbyPage(hostDriver);
+            guestLobbyPage = new LobbyPage(guestDriver);
+            hostLobbyPage.Navigate();
+            guestLobbyPage.Navigate();
+
+            hostLobbyPage.HostButton.Click();
+            _waitForElement(hostDriver, By.ClassName(LobbyPage.modalContentClassName));
+
+            guestLobbyPage.RefreshButton.Click();
+            _waitForElement(guestDriver, By.CssSelector(LobbyPage.firstRoomInLobbySelector));
+            guestLobbyPage.FirstRoom.Click();
         }
     }
 }
