@@ -12,17 +12,54 @@ namespace TicTacToeSeleniumTests
 {
     abstract class SeleniumTestsBase
     {
+        public static class SeleniumConfig
+        {
+            public static DriverType SelectedDriver { get; set; } = DriverType.Chrome;
+            public static TimeSpan BaseTimeout { get; set; } = TimeSpan.FromSeconds(20);
+            #warning Remember to change pathToDrivers to your own
+            public static string pathToDrivers = @"C:\Users\Mateusz Sobo\Desktop\Studium dyplomowe\TicTacToeOnlineServer\TicTacToeSeleniumTests\bin\Debug\netcoreapp2.1";
+        }
+
+        readonly IDictionary<RemoteWebDriver, WebDriverWait> _webDriverWaiters 
+            = new Dictionary<RemoteWebDriver, WebDriverWait>();
+
         protected RemoteWebDriver _getNewInstanceOfRequiredDriver()
         {
-            //return new EdgeDriver(SeleniumConfig.pathToDrivers);
-            //return new FirefoxDriver(SeleniumConfig.pathToDrivers);
+            if (SeleniumConfig.SelectedDriver == DriverType.Firefox)
+                return new FirefoxDriver(SeleniumConfig.pathToDrivers);
+            if (SeleniumConfig.SelectedDriver == DriverType.Edge)
+                return new EdgeDriver(SeleniumConfig.pathToDrivers);
+
             return new ChromeDriver(SeleniumConfig.pathToDrivers);
+        }
+
+        protected WebDriverWait _getWebDriverWait(RemoteWebDriver driver, TimeSpan timeout)
+        {
+            if (_webDriverWaiters.ContainsKey(driver))
+            {
+                return _webDriverWaiters[driver];
+            }
+            else
+            {
+                var waiter = new WebDriverWait(driver, timeout);
+                _webDriverWaiters.Add(driver, waiter);
+                return waiter;
+            }
+        }
+
+        protected WebDriverWait _getWebDriverWait(RemoteWebDriver driver)
+        {
+            return _getWebDriverWait(driver, SeleniumConfig.BaseTimeout);
         }
 
         protected void _verifyIfElementExistAfter(TimeSpan timeout, RemoteWebDriver driver, By by)
         {
-            new WebDriverWait(driver, timeout)
-                    .Until(ExpectedConditions.ElementExists(by));
+            _getWebDriverWait(driver, timeout).Until(ExpectedConditions.ElementExists(by));
+        }
+
+        protected void _verifyIfElementExist(RemoteWebDriver driver, By by)
+        {
+            _verifyIfElementExistAfter(SeleniumConfig.BaseTimeout, driver, by);
         }
 
         /// <summary>
@@ -30,21 +67,40 @@ namespace TicTacToeSeleniumTests
         /// </summary>
         protected void _verifyUserIsRedirected(string partOfUrlAfterBase, RemoteWebDriver driver)
         {
-            new WebDriverWait(driver, SeleniumConfig.BaseTimeout)
-                    .Until(ExpectedConditions.UrlContains(partOfUrlAfterBase));
+            _getWebDriverWait(driver).Until(ExpectedConditions.UrlContains(partOfUrlAfterBase));
+        }
+
+        protected void _waitUntilUserIsRedirected(string partOfUrlAfterBase, RemoteWebDriver driver)
+        {
+            _getWebDriverWait(driver).Until(ExpectedConditions.UrlContains(partOfUrlAfterBase));
         }
 
         protected void _waitForElement(RemoteWebDriver driver, By by)
         {
-            new WebDriverWait(driver, SeleniumConfig.BaseTimeout)
-                    .Until(ExpectedConditions.ElementExists(by));
+            _getWebDriverWait(driver).Until(ExpectedConditions.ElementExists(by));
         }
 
-        public static class SeleniumConfig
+        protected void _verifyTextIsInElement(RemoteWebDriver driver, IWebElement element, string text)
         {
-            public static TimeSpan BaseTimeout { get; set; } = TimeSpan.FromSeconds(40);
-            #warning Remember to change pathToDrivers to your own
-            public static string pathToDrivers = @"C:\Users\Mateusz Sobo\Desktop\Studium dyplomowe\TicTacToeOnlineServer\TicTacToeSeleniumTests\bin\Debug\netcoreapp2.1";
+            _getWebDriverWait(driver)
+                     .Until(
+                        ExpectedConditions.TextToBePresentInElement(element, text)
+                    );
+        }
+
+        protected void _waitForTextInElement(RemoteWebDriver driver, IWebElement element, string text)
+        {
+            _getWebDriverWait(driver)
+                     .Until(
+                        ExpectedConditions.TextToBePresentInElement(element, text)
+                    );
+        }
+
+        public enum DriverType
+        {
+            Firefox,
+            Chrome,
+            Edge,
         }
     }
 }

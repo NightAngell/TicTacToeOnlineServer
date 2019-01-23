@@ -10,11 +10,11 @@ namespace TicTacToeSeleniumTests.PageObjects
     class MultiplayerGamePage : PageObjectBase
     {
         public const string TopLeftButtonSelector = "app-game > div > div:nth-child(1) > div:nth-child(1)";
-        public const string TopButtonSelector = "aapp-game > div > div:nth-child(1) > div:nth-child(2)";
+        public const string TopButtonSelector = "app-game > div > div:nth-child(1) > div:nth-child(2)";
         public const string TopRightButtonSelector = "app-game > div > div:nth-child(1) > div:nth-child(3)";
 
         public const string MiddleLeftButtonSelector = "app-game > div > div:nth-child(2) > div:nth-child(1)";
-        public const string MiddleButtonSelector = "aapp-game > div > div:nth-child(2) > div:nth-child(2)";
+        public const string MiddleButtonSelector = "app-game > div > div:nth-child(2) > div:nth-child(2)";
         public const string MiddleRightButtonSelector = "app-game > div > div:nth-child(2) > div:nth-child(3)";
 
         public const string BottomLeftButtonSelector = "app-game > div > div:nth-child(3) > div:nth-child(1)";
@@ -58,7 +58,7 @@ namespace TicTacToeSeleniumTests.PageObjects
                 IWebElement button;
                 try
                 {
-                    button = _driver.FindElementByClassName("okButton");
+                    button = Driver.FindElementByClassName("okButton");
                 }
                 catch (NoSuchElementException e)
                 {

@@ -77,7 +77,7 @@ namespace TicTacToeSeleniumTests.PageObjects
                 IWebElement button;
                 try
                 {
-                    button = _driver.FindElementByClassName("okButton");
+                    button = Driver.FindElementByClassName("okButton");
                 }
                 catch(NoSuchElementException e)
                 {
