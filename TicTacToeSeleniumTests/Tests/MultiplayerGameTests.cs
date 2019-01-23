@@ -56,7 +56,7 @@ namespace TicTacToeSeleniumTests.Tests
         }
 
         [Test]
-        public void HostWinGame_HostSeeCongratulationsModalAndGuestSeeOuhModal()
+        public void HostWinGame_PlayersSeeInfoModalWithResultOfTheGame()
         {
             using (var hostDriver = _getNewInstanceOfRequiredDriver())
             using (var guestDriver = _getNewInstanceOfRequiredDriver())
