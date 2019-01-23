@@ -6,22 +6,23 @@ namespace TicTacToeSeleniumTests.PageObjects
 {
     abstract class PageObjectBase
     {
-        protected readonly RemoteWebDriver _driver;
-        protected string _baseAddress = "http://localhost:4200/";
-        protected string _addressAfterBaseAddress = "";
+        public RemoteWebDriver Driver { get; protected set; }
+        //TODO add check if base address ane with "/" char
+        public string BaseAddress { get; protected set; } = "http://localhost:4200/";
+        public string AddressAfterBaseAddress { get; protected set; } = "";
 
         public PageObjectBase(RemoteWebDriver driver, string addressAfterBaseAddress)
         {
-            _driver = driver;
-            _addressAfterBaseAddress = addressAfterBaseAddress;
+            Driver = driver;
+            AddressAfterBaseAddress = addressAfterBaseAddress;
             PageFactory.InitElements(driver, this);
         }
 
         public void Navigate()
         {
-            _driver
+            Driver
                 .Navigate()
-                .GoToUrl($"{_baseAddress}{_addressAfterBaseAddress}");
+                .GoToUrl($"{BaseAddress}{AddressAfterBaseAddress}");
         }
     }
 }

@@ -10,6 +10,9 @@ namespace TicTacToeSeleniumTests.PageObjects
     class LobbyPage : PageObjectBase
     {
         public const string modalContentClassName = "modalContent";
+        public const string infoModalTagName = "app-info-modal";
+        public const string infoModalInfoDivSelector = "app-info-modal .modalInfo";
+        public const string infoModalButtonDivButtonSelector = "app-info-modal .modalOkButton";
 
         /// <summary>
         /// This element exist only if room is hosted in lobby
@@ -60,6 +63,13 @@ namespace TicTacToeSeleniumTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = firstRoomInLobbySelector)]
         public IWebElement FirstRoom { get; set; }
 
-        
+        [FindsBy(How = How.TagName, Using = infoModalTagName)]
+        public IWebElement InfoModal { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = infoModalInfoDivSelector)]
+        public IWebElement InfoModalInfoDiv { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = infoModalButtonDivButtonSelector)]
+        public IWebElement InfoModalOkButton { get; set; }
     }
 }
