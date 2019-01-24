@@ -88,11 +88,11 @@ namespace TicTacToeSeleniumTests
                     );
         }
 
-        protected void _waitForTextInElement(RemoteWebDriver driver, IWebElement element, string text)
+        protected void _waitForTextInElement(RemoteWebDriver driver, By by, string text)
         {
             _getWebDriverWait(driver)
                      .Until(
-                        ExpectedConditions.TextToBePresentInElement(element, text)
+                        ExpectedConditions.TextToBePresentInElementLocated(by, text)
                     );
         }
 

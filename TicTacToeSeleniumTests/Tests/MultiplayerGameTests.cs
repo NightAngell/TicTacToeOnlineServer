@@ -4,6 +4,8 @@ using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using TicTacToeSeleniumTests.PageObjects;
 
 namespace TicTacToeSeleniumTests.Tests
@@ -54,7 +56,7 @@ namespace TicTacToeSeleniumTests.Tests
         }
 
         [Test]
-        public void HostWinGame_HostSeeCongratulationsModalAndGuestSeeOuhModal()
+        public void HostWinGame_PlayersSeeInfoModalWithResultOfTheGame()
         {
             using (var hostDriver = _getNewInstanceOfRequiredDriver())
             using (var guestDriver = _getNewInstanceOfRequiredDriver())
@@ -71,22 +73,37 @@ namespace TicTacToeSeleniumTests.Tests
                  );
 
                 hostGame.MiddleButton.Click();
-                _waitForTextInElement(guestDriver, guestGame.MiddleButton, "x");
+                _waitForTextInElement(
+                    guestDriver,
+                    By.CssSelector(MultiplayerGamePage.MiddleButtonSelector),
+                    "x");
 
                 guestGame.TopButton.Click();
-                _waitForTextInElement(hostDriver, guestGame.TopButton, "o");
+                _waitForTextInElement(
+                   hostDriver,
+                   By.CssSelector(MultiplayerGamePage.TopButtonSelector),
+                   "o");
 
                 hostGame.MiddleLeftButton.Click();
-                _waitForTextInElement(guestDriver, guestGame.MiddleLeftButton, "x");
+                _waitForTextInElement(
+                    guestDriver,
+                    By.CssSelector(MultiplayerGamePage.MiddleLeftButtonSelector),
+                    "x");
 
                 guestGame.TopLeftButton.Click();
-                _waitForTextInElement(hostDriver, guestGame.TopLeftButton, "o");
+                _waitForTextInElement(
+                  hostDriver,
+                  By.CssSelector(MultiplayerGamePage.TopLeftButtonSelector),
+                  "o");
 
                 hostGame.MiddleRightButton.Click();
-                _waitForTextInElement(guestDriver, guestGame.MiddleRightButton, "x");
+                _waitForTextInElement(
+                    guestDriver,
+                    By.CssSelector(MultiplayerGamePage.MiddleRightButtonSelector),
+                    "x");
 
-                _verifyIfElementExist(hostDriver, By.ClassName("modalOkButton"));
-                _verifyIfElementExist(guestDriver, By.ClassName("modalOkButton"));
+                _verifyIfElementExist(hostDriver, By.CssSelector(".modalOkButton"));
+                _verifyIfElementExist(guestDriver, By.CssSelector(".modalOkButton"));
 
                 _logoutBothPlayers(hostLobbyPage, guestLobbyPage);
             }
