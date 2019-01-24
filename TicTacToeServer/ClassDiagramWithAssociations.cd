@@ -92,9 +92,9 @@
       <FileName>Hubs\GameHub.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Field Name="_db" />
       <Field Name="_gameService" />
       <Field Name="_roomService" />
+      <Field Name="_db" />
     </ShowAsAssociation>
   </Class>
   <Class Name="TicTacToeServer.Hubs.RoomHub">
@@ -153,7 +153,7 @@
   <Class Name="TicTacToeServer.Migrations.fix" Collapsed="true">
     <Position X="22.5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAI=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Migrations\20190123182100_fix.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -174,23 +174,19 @@
   <Class Name="TicTacToeServer.Models.Game">
     <Position X="18" Y="22" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAACCAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAgAA=</HashCode>
+      <HashCode>AAACAAAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAgAA=</HashCode>
       <FileName>Models\Game.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Field" />
-      <Property Name="Room" />
     </ShowAsAssociation>
   </Class>
   <Class Name="TicTacToeServer.Models.GameField">
     <Position X="14.5" Y="22.25" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAACAgIAAAAAABAAACEAAAAAAAgIAAAIAAAQIAABAEA=</HashCode>
+      <HashCode>AAACAgIAAAAAABAAACAAAAAAAAAIAAAIAAAQIAABAEA=</HashCode>
       <FileName>Models\GameField.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="Game" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="TicTacToeServer.Models.Room">
     <Position X="21.75" Y="21.25" Width="3" />
@@ -200,8 +196,8 @@
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="_roomState" />
-      <Property Name="Game" />
       <Property Name="State" />
+      <Property Name="Game" />
     </ShowAsAssociation>
   </Class>
   <Class Name="TicTacToeServer.Services.GameService" BaseTypeListCollapsed="true">
