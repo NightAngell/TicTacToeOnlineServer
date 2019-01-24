@@ -15,6 +15,7 @@ namespace TicTacToeServer.Models
         [Required]
         public GameField Field { get; set; }
 
+        [Required]
         public string CurrentPlayerId { get; set; }
 
         public int RoomId { get; set; }

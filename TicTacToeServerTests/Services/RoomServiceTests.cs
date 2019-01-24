@@ -273,6 +273,7 @@ namespace TicTacToeServerTests.Services
         {
             var room = new Room { HostNick = "nick" };
             room.InitGame();
+            room.Game.CurrentPlayerId = "playerID";
             using (var db = new Db(SqliteInMemory.CreateOptions<Db>()))
             {
                 await db.Database.EnsureCreatedAsync();
