@@ -102,12 +102,7 @@ namespace TicTacToeServerTests.Services
                 db.Rooms.Add(room);
                 await db.SaveChangesAsync();
                 _mapperMock.Setup(m => m.Map<RoomDto>(room)).Returns(
-                    new RoomDto
-                    {
-                        Id = room.Id,
-                        HostNick = hostNick,
-                        IsPassword = isPassword
-                    }
+                    new RoomDto(room.Id, isPassword, hostNick)
                 );
 
                 _roomService = new RoomService(db, _mapperMock.Object);
@@ -138,7 +133,7 @@ namespace TicTacToeServerTests.Services
                 await db.SaveChangesAsync();
 
                 _mapperMock.Setup(m => m.Map<RoomDto>(It.IsAny<RoomDto>())).Returns(
-                    new RoomDto()    
+                    new RoomDto(1, false, "hostnick")    
                 );
 
                 _roomService = new RoomService(db, _mapperMock.Object);

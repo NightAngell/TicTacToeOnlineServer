@@ -75,10 +75,7 @@ namespace TicTacToeServer.Controllers
                 var token = _tokenService.GetToken(claims);
 
                 return Ok(
-                    new TokenWithExpirationDto {
-                        Token = new JwtSecurityTokenHandler().WriteToken(token),
-                        Expiration = token.ValidTo
-                    } 
+                    new TokenWithExpirationDto(new JwtSecurityTokenHandler().WriteToken(token), token.ValidTo)
                 );
             }
 
@@ -96,11 +93,7 @@ namespace TicTacToeServer.Controllers
             var token = _tokenService.GetToken(claims);
 
             return Ok(
-                new TokenWithExpirationDto
-                {
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    Expiration = token.ValidTo
-                }
+                new TokenWithExpirationDto(new JwtSecurityTokenHandler().WriteToken(token), token.ValidTo)
             );
         }
     }

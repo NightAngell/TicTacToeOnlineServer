@@ -25,7 +25,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.DTO.LoginDto">
-    <Position X="34.5" Y="9.5" Width="2.25" />
+    <Position X="34.5" Y="9.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
       <FileName>DTO\LoginDto.cs</FileName>

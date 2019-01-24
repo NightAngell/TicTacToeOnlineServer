@@ -53,7 +53,7 @@ namespace TicTacToeServerTests.Controllers
             var roomDtos = new List<RoomDto>();
             for(var i = 0; i < numberOfDtos; i++)
             {
-                roomDtos.Add(new RoomDto());
+                roomDtos.Add(new RoomDto(i, false, ""));
             }
 
             return roomDtos;
