@@ -30,28 +30,28 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.DTO.LoginDto">
-    <Position X="13.25" Y="1.75" Width="2.25" />
+    <Position X="11.75" Y="0.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
       <FileName>DTO\LoginDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.DTO.RegisterDto">
-    <Position X="21.5" Y="2" Width="1.5" />
+    <Position X="18" Y="3" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
       <FileName>DTO\RegisterDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.DTO.RoomDto">
-    <Position X="16" Y="2" Width="1.5" />
+    <Position X="14.75" Y="0.75" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAACAAAAAAAAAAAAAABAAAAAAA=</HashCode>
       <FileName>DTO\RoomDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.DTO.TokenWithExpirationDto">
-    <Position X="19.75" Y="2" Width="1.5" />
+    <Position X="19" Y="0.75" Width="3.75" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
       <FileName>DTO\TokenWithExpirationDto.cs</FileName>
@@ -72,7 +72,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.Extensions.HubExtension">
-    <Position X="17.75" Y="0.5" Width="5" />
+    <Position X="22" Y="3.25" Width="5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
       <FileName>Extensions\HubExtension.cs</FileName>
@@ -153,7 +153,7 @@
   <Class Name="TicTacToeServer.Migrations.fix" Collapsed="true">
     <Position X="22.5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAI=</HashCode>
       <FileName>Migrations\20190123182100_fix.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -165,7 +165,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.Models.AppUser">
-    <Position X="13.75" Y="0.5" Width="1.5" />
+    <Position X="7.25" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\AppUser.cs</FileName>
@@ -174,7 +174,7 @@
   <Class Name="TicTacToeServer.Models.Game">
     <Position X="18" Y="22" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAgAA=</HashCode>
+      <HashCode>AAACAAACCAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAgAA=</HashCode>
       <FileName>Models\Game.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -184,7 +184,7 @@
   <Class Name="TicTacToeServer.Models.GameField">
     <Position X="14.5" Y="22.25" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAACAgIAAAAAABAAACAAAAAAAAAIAAAIAAAQIAABAEA=</HashCode>
+      <HashCode>AAACAgIAAAAAABAAACEAAAAAAAgIAAAIAAAQIAABAEA=</HashCode>
       <FileName>Models\GameField.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -212,7 +212,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TicTacToeServer.Services.GuidService" BaseTypeListCollapsed="true">
-    <Position X="15.75" Y="0.5" Width="1.5" />
+    <Position X="9.5" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Services\GuidService.cs</FileName>
@@ -220,7 +220,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TicTacToeServer.Services.JwtTokenService" BaseTypeListCollapsed="true">
-    <Position X="26.25" Y="17.25" Width="3.5" />
+    <Position X="25.25" Y="7.25" Width="3.75" />
     <TypeIdentifier>
       <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
       <FileName>Services\JwtTokenService.cs</FileName>
@@ -243,14 +243,14 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TicTacToeServer.Program">
-    <Position X="18" Y="2" Width="1.5" />
+    <Position X="12.75" Y="3" Width="3.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TicTacToeServer.Startup">
-    <Position X="26.25" Y="13.5" Width="5.5" />
+    <Position X="24.25" Y="9.5" Width="5.5" />
     <TypeIdentifier>
       <HashCode>IAAAAABAAQAAAACAAABAAAAAAAAEAAAAgAQACAAAAAA=</HashCode>
       <FileName>Startup.cs</FileName>
@@ -264,7 +264,7 @@
     <TypeIdentifier />
   </Class>
   <Class Name="Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext&lt;TUser&gt;" Collapsed="true">
-    <Position X="7" Y="12.5" Width="1.5" />
+    <Position X="7" Y="12.5" Width="2.75" />
     <TypeIdentifier />
   </Class>
   <Class Name="System.Exception" Collapsed="true">
@@ -311,21 +311,21 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="TicTacToeServer.Services.IGameService">
-    <Position X="7.5" Y="2" Width="4.75" />
+    <Position X="0.5" Y="9" Width="4.75" />
     <TypeIdentifier>
       <HashCode>AAAgAqgAAAAIgEAAAAAAAAAAAAAAAgAABEAAAAAAAAA=</HashCode>
       <FileName>Services\Interfaces\IGameService.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="TicTacToeServer.Services.IGuidService">
-    <Position X="20.25" Y="11.5" Width="1.5" />
+    <Position X="20.25" Y="19.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Services\Interfaces\IGuidService.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="TicTacToeServer.Services.IJwtTokenService">
-    <Position X="23.25" Y="11.5" Width="3.5" />
+    <Position X="23.25" Y="17.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Services\Interfaces\IJwtTokenService.cs</FileName>
@@ -339,29 +339,29 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="AutoMapper.IMapper" Collapsed="true">
-    <Position X="2.25" Y="12.25" Width="1.5" />
+    <Position X="1.75" Y="18.25" Width="1.5" />
     <TypeIdentifier />
   </Interface>
   <Interface Name="Microsoft.Extensions.Configuration.IConfiguration" Collapsed="true">
-    <Position X="23.25" Y="17.75" Width="1.5" />
+    <Position X="20.25" Y="11.75" Width="1.5" />
     <TypeIdentifier />
   </Interface>
   <Enum Name="TicTacToeServer.Enums.GameFieldFields">
-    <Position X="23.25" Y="2" Width="1.5" />
+    <Position X="10" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgIAAAAAABAAACAAAAAAAAAIAAAAAAAQIAABAEA=</HashCode>
       <FileName>Enums\GameFieldFields.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TicTacToeServer.Enums.Roles">
-    <Position X="21.5" Y="3.5" Width="1.5" />
+    <Position X="7.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAABAAAAAAAAAAQAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Enums\Roles.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="TicTacToeServer.Enums.RoomState">
-    <Position X="22.25" Y="25.25" Width="2" />
+    <Position X="26.25" Y="22.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAIgAAAAAAAAAAAAAAACAAAAAACAAAAAAAAAAAAAA=</HashCode>
       <FileName>Enums\RoomState.cs</FileName>
