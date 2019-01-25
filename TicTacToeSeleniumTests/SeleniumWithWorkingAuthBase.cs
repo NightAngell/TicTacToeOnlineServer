@@ -22,6 +22,7 @@ namespace TicTacToeSeleniumTests
 
         protected void LogOut(RemoteWebDriver driver)
         {
+            _waitForElement(driver, By.CssSelector(".logout"));
             driver.FindElementByClassName("logout").Click();
         }
     }
