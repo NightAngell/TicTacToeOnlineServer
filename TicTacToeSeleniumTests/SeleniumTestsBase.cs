@@ -14,8 +14,8 @@ namespace TicTacToeSeleniumTests
     {
         public static class SeleniumConfig
         {
-            public static DriverType SelectedDriver { get; set; } = DriverType.Chrome;
-            public static TimeSpan BaseTimeout { get; set; } = TimeSpan.FromSeconds(20);
+            public static DriverType SelectedDriver { get; set; } = DriverType.Firefox;
+            public static TimeSpan BaseTimeout { get; set; } = TimeSpan.FromSeconds(30);
             #warning Remember to change pathToDrivers to your own
             public static string pathToDrivers = @"C:\Users\Mateusz Sobo\Desktop\Studium dyplomowe\TicTacToeOnlineServer\TicTacToeSeleniumTests\bin\Debug\netcoreapp2.1";
         }
@@ -23,13 +23,27 @@ namespace TicTacToeSeleniumTests
         readonly IDictionary<RemoteWebDriver, WebDriverWait> _webDriverWaiters 
             = new Dictionary<RemoteWebDriver, WebDriverWait>();
 
+        private static bool CanUseEdge = true;
+
         protected RemoteWebDriver _getNewInstanceOfRequiredDriver()
         {
             if (SeleniumConfig.SelectedDriver == DriverType.Firefox)
                 return new FirefoxDriver(SeleniumConfig.pathToDrivers);
             if (SeleniumConfig.SelectedDriver == DriverType.Edge)
-                return new EdgeDriver(SeleniumConfig.pathToDrivers);
+            {
+                //https://github.com/SeleniumHQ/selenium/issues/4650
+                //We need 2 browser instances, but because this bug, we cannot have
+                //Two edges same time
+                if(CanUseEdge)
+                {
+                    CanUseEdge = false;
+                    return new EdgeDriver(SeleniumConfig.pathToDrivers);
+                }
 
+                CanUseEdge = true;
+                return new ChromeDriver(SeleniumConfig.pathToDrivers);
+            }
+               
             return new ChromeDriver(SeleniumConfig.pathToDrivers);
         }
 
