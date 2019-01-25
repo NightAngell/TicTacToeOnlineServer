@@ -13,7 +13,12 @@ namespace TicTacToeServer.Helpers
         public MappingProfile()
         {
             CreateMap<Room, RoomDto>()
-                .ForMember(r => r.IsPassword, m => m.MapFrom(rd => rd.Password != null && rd.Password.Length > 0 ));
+                 .ConstructUsing(x => new RoomDto(
+                     x.Id,
+                     x.Password != null && x.Password.Length > 0,
+                     x.HostNick
+                 )
+            );
         }
     }
 }
