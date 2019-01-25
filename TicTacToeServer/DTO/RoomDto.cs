@@ -7,8 +7,15 @@ namespace TicTacToeServer.DTO
 {
     public class RoomDto
     {
-        public int Id { get; set; }
-        public bool IsPassword { get; set; }
-        public string HostNick { get; set; }
+        public RoomDto(int id, bool isPassword, string hostNick)
+        {
+            Id = id;
+            IsPassword = isPassword;
+            HostNick = hostNick;
+        }
+
+        public int Id { get; private set; }
+        public bool IsPassword { get; private set; }
+        public string HostNick { get; private set; }
     }
 }

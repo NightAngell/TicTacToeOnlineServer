@@ -8,11 +8,17 @@ namespace TicTacToeServer.DTO
 {
     public class LoginDto
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public LoginDto(string email, string password)
+        {
+            Email = email;
+            Password = password;
+        }
 
         [Required]
-        public string Password { get; set; }
+        [EmailAddress]
+        public string Email { get; private set; }
+
+        [Required]
+        public string Password { get; private set; }
     }
 }

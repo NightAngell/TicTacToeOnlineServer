@@ -26,21 +26,12 @@ namespace TicTacToeServerTests.Controllers
         Mock<IGuidService> _guidServiceMock;
         Mock<IJwtTokenService> _tokenServiceMock;
 
-        readonly LoginDto _validLoginDto = new LoginDto
-        {
-            Email = "Valid@User.Data",
-            Password = "qwertyu123"
-        };
-        readonly RegisterDto _validRegisterDto = new RegisterDto
-        {
-            Email = "Valid@User.Data",
-            Password = "qwertyu123"
-        };
-        readonly RegisterDto _invalidRegisterDto = new RegisterDto
-        {
-            Email = "Lorem",
-            Password = "Ipsum"
-        };
+        readonly LoginDto _validLoginDto = new LoginDto(
+            email: "Valid@User.Data",
+            password: "qwertyu123"
+        );
+        readonly RegisterDto _validRegisterDto = new RegisterDto("Valid@User.Data", "qwertyu123");
+        readonly RegisterDto _invalidRegisterDto = new RegisterDto("Lorem", "Ipsum");
 
         [SetUp]
         public void SetUp()
@@ -162,10 +153,7 @@ namespace TicTacToeServerTests.Controllers
         {
             _initAuthController();
 
-            var actionResult = await _authController.Login(new LoginDto {
-                Email = "invalidEmail.pl",
-                Password = "qwerty123"
-            });
+            var actionResult = await _authController.Login(new LoginDto("invalidEmail.pl","qwerty123"));
 
             Assert.IsTrue(actionResult is UnauthorizedResult);
         }
@@ -181,11 +169,7 @@ namespace TicTacToeServerTests.Controllers
                 .ReturnsAsync(false);
             _initAuthController();
 
-            var actionResult = await _authController.Login(new LoginDto
-            {
-                Email = "valid@Email.com",
-                Password = ""
-            });
+            var actionResult = await _authController.Login(new LoginDto("valid@Email.com", ""));
 
             Assert.IsTrue(actionResult is UnauthorizedResult);
         }

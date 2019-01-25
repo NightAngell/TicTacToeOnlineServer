@@ -7,7 +7,13 @@ namespace TicTacToeServer.DTO
 {
     public class TokenWithExpirationDto
     {
-        public string Token { get; set; }
-        public DateTime Expiration { get; set; }
+        public TokenWithExpirationDto(string token, DateTime validTo)
+        {
+            Token = token;
+            Expiration = validTo;
+        }
+
+        public string Token { get; private set; }
+        public DateTime Expiration { get; private set; }
     }
 }
