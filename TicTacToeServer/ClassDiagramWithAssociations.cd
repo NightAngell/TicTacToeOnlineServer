@@ -179,6 +179,7 @@
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Field" />
+      <Property Name="Room" />
     </ShowAsAssociation>
   </Class>
   <Class Name="TicTacToeServer.Models.GameField">
@@ -187,6 +188,9 @@
       <HashCode>AAACAgIAAAAAABAAACEAAAAAAAgIAAAIAAAQIAABAEA=</HashCode>
       <FileName>Models\GameField.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Game" />
+    </ShowAsAssociation>
   </Class>
   <Class Name="TicTacToeServer.Models.Room">
     <Position X="21.75" Y="21.25" Width="3" />
